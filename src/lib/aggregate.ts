@@ -1,5 +1,59 @@
 import { Compute, Filter, FloorType, Multiplier, Run, RunComp, Stats, type ResourceID } from "./data";
 
+function addStats(self: Stats, other: Stats) {
+    self.count += other.count;
+    
+    self.total += other.total;
+    self.wins += other.wins;
+}
+
+export interface GenStats {
+    deathAct1: Stats,
+    deathAct2: Stats,
+    deathAct3: Stats,
+    wins: Stats
+}
+
+export namespace GenStats {
+    export function empty() : GenStats {
+        return {
+            deathAct1: Stats.empty(),
+            deathAct2: Stats.empty(),
+            deathAct3: Stats.empty(),
+            wins: Stats.empty()
+        }
+    }
+
+    export function add(self: GenStats, other: GenStats) {
+        addStats(self.deathAct1, other.deathAct1);
+        addStats(self.deathAct2, other.deathAct2);
+        addStats(self.deathAct3, other.deathAct3);
+        addStats(self.wins, other.wins);
+    }
+
+    export function from(run: Run, comp: RunComp) : GenStats {
+        let gs = GenStats.empty();
+        for (let i = 1; i <= 3; i++) {
+            const stat = gs[`deathAct${i}` as keyof GenStats] as Stats;
+            if (comp.acts.length >= i) {
+                stat.count += 1;
+                stat.total += 1;
+                if (!(comp.acts.length >= i+1 || run.win)) {
+                    stat.wins += 1;
+                }
+            }
+        }
+
+        gs.wins.count += 1;
+        gs.wins.total += 1;
+        if (run.win) {
+            gs.wins.wins += 1;
+        }
+
+        return gs;
+    }
+}
+
 export interface ResStats {
     easy: Stats,
     act1: Stats,
@@ -23,18 +77,10 @@ export namespace ResStats {
         addStats(self.act2, other.act2);
         addStats(self.all, other.all);
     }
-
-
-    function addStats(self: Stats, other: Stats) {
-        self.count += other.count;
-        
-        self.total += other.total;
-        self.wins += other.wins;
-    }
 }
 
 export interface FullStats {
-    genStats: ResStats,
+    genStats: GenStats,
     resStats: Record<ResourceID, ResStats>,
 
     relics: ResourceID[],
@@ -44,22 +90,13 @@ export interface FullStats {
 export namespace FullStats {
     export function empty() : FullStats {
         return {
-            genStats: ResStats.empty(),
+            genStats: GenStats.empty(),
             resStats: {},
             relics: [],
             cards: []
         };
     }
 }
-
-const GEN_MULT: Record<keyof ResStats, Multiplier>  = {
-    "all": () => 1,
-    "act1": (_, comp) => comp.acts.length >= 2 ? 1 : 0,
-    "act2": (_, comp) => comp.acts.length >= 3 ? 1 : 0,
-    "easy": (run) => 
-        Number(run.floors.slice(0, -1).find(floor => floor.type == FloorType.ELITE) != null
-        || run.floors.slice(0, -1).filter(floor => floor.type == FloorType.HALLWAY).length > 3)
-};
 
 const RES_MULT: Record<keyof ResStats, (res:ResourceID) => Multiplier> = {
     "easy": Multiplier.resEasy,
@@ -85,9 +122,9 @@ export namespace FullStats {
             resStats[res] = resStat;
         }
 
-        let genStats: ResStats = {} as any;
-        for (let item in GEN_MULT) {
-            genStats[item as keyof ResStats] = Compute.stats(runs, comps, GEN_MULT[item as keyof ResStats]);
+        let genStats: GenStats = GenStats.empty();
+        for (let run of runs) {
+            GenStats.add(genStats, GenStats.from(run, comps[run.start]));
         }
 
         return {
@@ -102,7 +139,7 @@ export namespace FullStats {
 
     export function aggregate(stats: FullStats[]) : FullStats {
         let full: FullStats = {
-            genStats: ResStats.empty(),
+            genStats: GenStats.empty(),
             resStats: {},
             relics: [],
             cards: []
@@ -110,7 +147,7 @@ export namespace FullStats {
 
 
         for (let stat of stats){
-            ResStats.add(full.genStats, stat.genStats);
+            GenStats.add(full.genStats, stat.genStats);
 
             for (let res_ in stat.resStats) {
                 const res = res_ as ResourceID;

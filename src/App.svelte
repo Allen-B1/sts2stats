@@ -146,6 +146,7 @@
 
         await Promise.all(playerss.map(async players => {
             if (!(players in stats)) {
+                console.log("fetching player", players);
                 const runs = await db.getRuns(players);
                 const playerStats = await request({ kind: "get", runs: runs, filter: filter });
                 await db.addStats(players, filter, playerStats);

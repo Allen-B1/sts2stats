@@ -58,7 +58,7 @@ export class Database {
     async getLastUpdated(players: string) : Promise<number> { 
         const data = (await getDoc(doc(this.db, `runs-${players}/meta`))).data();
         if (!data) {
-            return 0;
+            return Infinity;
         } else {
             return Number(data);
         }

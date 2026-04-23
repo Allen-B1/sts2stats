@@ -21,32 +21,32 @@
     }
 </script>
 
-<div class="row" style="align-items: center">
-<div class="panel inline">
-<h3>Total Runs</h3>
-<p>{stats.genStats.all.count}</p>
+<div class="layout-row" style="align-items: center">
+<div class="panel rows">
+    <div><strong>Runs</strong> <span>{stats.genStats.wins.count}</span></div>
+    <div><strong>Win Rate</strong> {@html displayStats(stats.genStats.wins)}</div>
 </div>
 <div class="panel inline" style="align-items:flex-start">
-    <h3>WR | Survived</h3>
-    <div class="wins">
-        <div><strong title="Overall">All</strong>                   <span>{@html displayStats(stats.genStats.all)} </span></div>
-        <div><strong title="Survived Act 1">EoA1</strong>           <span>{@html displayStats(stats.genStats.act1)} </span></div>
-        <div><strong title="Survived Act 2">EoA2</strong>           <span>{@html displayStats(stats.genStats.act2)} </span></div>
+    <h3>Death Rate</h3>
+    <div class="rows wins">
+        <div><strong title="Overall">Act 1</strong>                   <span>{@html displayStats(stats.genStats.deathAct1)} </span></div>
+        <div><strong title="Survived Act 1">Act 2</strong>           <span>{@html displayStats(stats.genStats.deathAct2)} </span></div>
+        <div><strong title="Survived Act 2">Act 3</strong>           <span>{@html displayStats(stats.genStats.deathAct3)} </span></div>
     </div>
 </div>
 </div>
 
-<div class="row">
+<div class="layout-row">
 
 <div class="panel">
-<h3>WR | Relics</h3>
+<h3>Relics</h3>
 <table>
 <thead>
     <tr>
-        <th>Acquired before...</th>
-        <th title="1st Hard Combat">1HC</th>
-        <th title="End of Act 1">EoA1</th>
-        <th title="End of Act 2">EoA2</th>
+        <th>Relic</th>
+        <th title="Acquired before 1st hard combat">1HC</th>
+        <th title="Acquired before end of Act 1">EoA1</th>
+        <th title="Acquired before end of Act 2">EoA2</th>
         <th>All</th>
     </tr>
 </thead>
@@ -66,14 +66,14 @@
 </div>
 
 <div class="panel">
-<h3>WR | Cards</h3>
+<h3>Cards</h3>
 <table>
 <thead>
     <tr>
-        <th>Acquired before...</th>
-        <th title="1st Hard Combat">1HC</th>
-        <th title="End of Act 1">EoA1</th>
-        <th title="End of Act 2">EoA2</th>
+        <th>Card</th>
+        <th title="Acquired before 1st hard combat">1HC</th>
+        <th title="Acquired before end of Act 1">EoA1</th>
+        <th title="Acquired before end of Act 2">EoA2</th>
         <th>All</th>
     </tr>
 </thead>
@@ -94,15 +94,9 @@
 
 </div>
 
+
 <style>
     .wins strong {
         width: 48px;
-        display: inline-block;
-        text-align: right;
-        margin-right: 8px;
-    }
-    .wins span {
-        min-width: 48px;
-        display: inline-block;
     }
 </style>
