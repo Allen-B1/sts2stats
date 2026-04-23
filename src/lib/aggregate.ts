@@ -1,4 +1,4 @@
-import { Compute, Filter, FloorType, Run, RunComp, Stats, type ResourceID } from "./data";
+import { Compute, Filter, FloorType, Multiplier, Run, RunComp, Stats, type ResourceID } from "./data";
 
 export interface ResStats {
     easy: Stats,
@@ -52,7 +52,7 @@ export namespace FullStats {
     }
 }
 
-const GEN_FILTERS: Record<keyof ResStats, Filter>  = {
+const GEN_MULT: Record<keyof ResStats, Multiplier>  = {
     "all": () => 1,
     "act1": (_, comp) => comp.acts.length >= 2 ? 1 : 0,
     "act2": (_, comp) => comp.acts.length >= 3 ? 1 : 0,
@@ -61,11 +61,11 @@ const GEN_FILTERS: Record<keyof ResStats, Filter>  = {
         || run.floors.slice(0, -1).filter(floor => floor.type == FloorType.HALLWAY).length > 3)
 };
 
-const RES_FILTERS: Record<keyof ResStats, (res:ResourceID) => Filter> = {
-    "easy": Filter.resEasy,
-    "act1": (res: ResourceID) => Filter.resAct(res, 1),
-    "act2": (res: ResourceID) => Filter.resAct(res, 2),
-    "all": (res: ResourceID) => Filter.res(res)
+const RES_MULT: Record<keyof ResStats, (res:ResourceID) => Multiplier> = {
+    "easy": Multiplier.resEasy,
+    "act1": (res: ResourceID) => Multiplier.resAct(res, 1),
+    "act2": (res: ResourceID) => Multiplier.resAct(res, 2),
+    "all": Multiplier.res
 }
 
 export namespace FullStats {
@@ -79,15 +79,15 @@ export namespace FullStats {
         let resStats: Record<ResourceID, ResStats> = {};
         for (let res of resources) {
             let resStat: ResStats = {} as any;
-            for (let item in RES_FILTERS) {
-                resStat[item as keyof ResStats] = Compute.stats(runs, comps, RES_FILTERS[item as keyof ResStats](res));
+            for (let item in RES_MULT) {
+                resStat[item as keyof ResStats] = Compute.stats(runs, comps, RES_MULT[item as keyof ResStats](res));
             }
             resStats[res] = resStat;
         }
 
         let genStats: ResStats = {} as any;
-        for (let item in GEN_FILTERS) {
-            genStats[item as keyof ResStats] = Compute.stats(runs, comps, GEN_FILTERS[item as keyof ResStats]);
+        for (let item in GEN_MULT) {
+            genStats[item as keyof ResStats] = Compute.stats(runs, comps, GEN_MULT[item as keyof ResStats]);
         }
 
         return {
@@ -100,7 +100,7 @@ export namespace FullStats {
     
     }
 
-    export function aggregate(stats: Record<string, FullStats>, playerCount: 1 | 2 | 3 | 4 | "multi" | "any") : FullStats {
+    export function aggregate(stats: FullStats[]) : FullStats {
         let full: FullStats = {
             genStats: ResStats.empty(),
             resStats: {},
@@ -109,14 +109,7 @@ export namespace FullStats {
         };
 
 
-        for (let players in stats){
-            let n = players.split("-").length;
-
-            if (!(n == playerCount || playerCount == "any" || playerCount == "multi" && n >= 2)) {
-                continue;
-            }
-
-            const stat = stats[players];
+        for (let stat of stats){
             ResStats.add(full.genStats, stat.genStats);
 
             for (let res_ in stat.resStats) {

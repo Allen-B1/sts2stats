@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { Filter, RunComp, Stats, type Resource, type ResourceID, type Run } from "./lib/data";
+    import { Compute, Filter, RunComp, Stats, type Resource, type ResourceID, type Run } from "./lib/data";
     import { importRun } from "./lib/import";
     import { Errors, titlecase } from "./lib/utils";
     import { derived } from "svelte/store";
@@ -8,39 +8,24 @@
     import { FullStats } from "./lib/aggregate";
     import { Database } from "./lib/db";
     import StatsC from "./lib/components/StatsC.svelte";
+    import type { SWReq, SWResp } from "./lib/swdefs";
+    import { runTransaction } from "firebase/firestore";
 
     const errors = Errors.create();
     const db = new Database();
     const worker = new Worker();
 
-    function request(data: object) : Promise<any> {
+    function request(data: SWReq) : Promise<SWResp> {
         return new Promise((res) => {
             const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
             worker.postMessage({ reqid: id, ...data });
             worker.addEventListener("message", (e) => {
-                console.log(e.data.reqid);
                 if (e.data.reqid == id) {
                     res(e.data.result);
                 }
             });
         })
     }
-
-    let globalStats: Record<1 | "any" | "multi", FullStats> = {
-        [1]: FullStats.empty(),
-        "any": FullStats.empty(),
-        "multi": FullStats.empty()
-    };
-    let playerStats: Record<string, FullStats> = {};
-    onMount(async () => {
-        for (let mode of [1, "any", "multi"]) {
-            globalStats[mode as 1 | "any" | "multi"] = await db.getGlobalStats(mode+"");
-        }
-
-        playerStats = await db.getAllStats();
-
-        updateActiveStats();
-    })
 
     let files: FileList | null = $state(null);
     $effect(() => {
@@ -50,6 +35,7 @@
                 return;
             }
 
+            loading = true;
             id = Number(files[0].webkitRelativePath.split("/")[0]);
             if (!Number.isInteger(id) || id < 10) {
                 Errors.show(errors, "Invalid folder. Select the folder whose name is a large integer.");
@@ -64,35 +50,18 @@
                 .map(async ([file, fileText]) => {
                     try {
                         const run = importRun(JSON.parse(await fileText), id);
-                        await db.add(run);
+                        await db.addRun(run);
                         playerss.add(run.players.map(p => p.id).sort().join("-"));
                     } catch(err) {
                         console.error(err);
                         Errors.show(errors, "Invalid run: " + file.webkitRelativePath);
                     }                  
                 }));
-            
-
+        
             console.log("uploaded runs");
 
-            const playersList = [...playerss];
-            const playersRuns = await Promise.all(playersList.map(p => db.getAll(p)));
-            await Promise.all([playersList.map(async (players, i) => {
-                const runs = playersRuns[i].filter(run => run.asc == 10);
-                let stats: FullStats = await request({ kind: "fullstats", runs: runs });
-                await db.addStats(players, stats);
-            })]);
-
-            playerStats = await db.getAllStats();
-
-            await Promise.all(([1, "multi", "any"] as (1 | "multi" | "any")[]).map(async (mode) => {
-                globalStats[mode] = await request({ kind: "aggregate", stats: playerStats, mode });
-                await db.setGlobalStats(mode.toString(), globalStats[mode]);
-            }));
-
-            console.log("computed stats");
-
-            updateActiveStats();
+            await updateActiveStats();
+            loading = false;
         })();
     })
 
@@ -106,18 +75,89 @@
         id = +Number(localStorage.getItem("id"));
     });
 
-    let activeMode: 1 | "multi" | "any" | string = $state("any");
-    let activeFilter: string = $state("");
-    let activeStats: FullStats = $state(FullStats.empty());
-    function updateActiveStats() {
+
+    let activePlayers: string | null = $state(null);
+    window.addEventListener("hashchange", function() {
         if (location.hash.slice(1).length) {
-            activeMode = location.hash.slice(1);
+            activePlayers = location.hash.slice(1);
+        } else {
+            activePlayers = null;
+        }
+    });
+
+    let loading = $state(false);
+    let activeChar = $state({
+        "DEFECT": true,
+        "SILENT": true,
+        "IRONCLAD": true,
+        "REGENT": true,
+        "NECROBINDER": true
+    });
+    let activeAsc = $state(10);
+    let activeMode: "1" | "2" | "3" | "4" | "m" | "any" = $state("1");
+    let activeStats: FullStats = $state(FullStats.empty());
+    async function updateActiveStats() {
+        let filters = [];
+        let chars = [];
+        for (let char in activeChar) {
+            if (activeChar[char as "REGENT"]) {
+                chars.push(char);
+            }
+        }
+        if (chars.length != 5) {
+            filters.push("c-" + chars.join("-"));
         }
 
-        activeStats = Number(activeMode) < 10 || activeMode == "multi" || activeMode == "any" ? globalStats[activeMode as 1 | "multi" | "any"] : playerStats[activeMode];
+        if (activeAsc != null)
+            filters.push("asc-" + activeAsc);
+        if (activeMode != "any")
+            filters.push("p-" + activeMode);
+
+        const filter: Filter = filters.sort().join("_");
+        loading = true;
+        if (activePlayers) {
+            activeStats = await computeLocal(filter, activePlayers);
+        } else {
+            activeStats = await computeGlobal(filter);
+        }
+        loading = false;
     }
 
-    window.addEventListener("hashchange", updateActiveStats);
+    async function computeLocal(filter: Filter, players: string) : Promise<FullStats> {
+        let stats = await db.getStatsLocal(filter, players);
+        if (stats == null) {
+            const runs = await db.getRuns(players);
+            stats = await request({ kind: "get", runs: runs, filter: filter });
+            await db.addStats(players, filter, stats);
+        }
+        return stats;
+    }
+
+    async function computeGlobal(filter: Filter) : Promise<FullStats> {
+        let globalStats = await db.getGlobalStats(filter);
+        if (globalStats != null) {
+            return globalStats;
+        }
+
+        const [playerss, stats] = await Promise.all([
+            db.getPlayers(), db.getStats(filter)
+        ]);
+
+        await Promise.all(playerss.map(async players => {
+            if (!(players in stats)) {
+                const runs = await db.getRuns(players);
+                const playerStats = await request({ kind: "get", runs: runs, filter: filter });
+                await db.addStats(players, filter, playerStats);
+                stats[players] = playerStats;
+            }
+        }));
+
+        console.log("global stats not saved", stats);
+
+        globalStats = await request({ kind: "aggregate", stats: Object.values(stats) });
+        await db.setGlobalStats(filter, globalStats);
+        return globalStats;
+    }
 </script>
 
 
@@ -127,21 +167,51 @@
     <link href="https://fonts.googleapis.com/css2?family=Kreon:wght@300..700&family=Saira:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </svelte:head>
 
-<div class="top">
-Community<span style="width:8px;display:inline-block"></span>
-{#if activeMode == "multi" || activeMode == "any" || Number(activeMode) < 10}
-<select bind:value={activeMode}>
-    <option value={1}>Solo</option>
-    <option value={"multi"}>Multi</option>
-    <option value={"any"} selected>Any</option>
-</select>
-{:else}
-{@const parts = activeMode.toString().split("-")}
-Player{parts.length>1?"s":""} {parts.join(" & ")}
-{/if}
-<div style="flex-grow:1"></div>
-<input type="file" bind:files={files} webkitdirectory accept=".run">
+<div class="sidebar">
+<h3>Filters</h3>
+<div class="field">
+    <label style="flex-grow:1">Dataset</label>
+    <span>
+        {#if activePlayers}
+            {activePlayers.includes("-") ? "Players" : "Player"} #{activePlayers.split("-").join(", #")}
+        {:else}
+            Global
+        {/if}
+    </span>
 </div>
+<div class="field">
+    <label for="asc">Ascension</label>
+    <input id="asc" bind:value={activeAsc} type="number" min="0" max="10">
+</div>
+<div class="field">
+    <label for="asc">Players</label>
+    <select bind:value={activeMode}>
+        <option value="any">Any</option>
+        <option value="1">Singleplayer</option>
+        <option value="m">Multiplayer</option>
+        <option value="2">2p</option>
+        <option value="3">3p</option>
+        <option value="4">4p</option>
+    </select>
+</div>
+<div class="field large">
+    <label>Characters</label>
+    <div class="field-row"><span>Ironclad</span>    <input type="checkbox" bind:checked={activeChar.IRONCLAD} />    </div>
+    <div class="field-row"><span>Silent</span>      <input type="checkbox" bind:checked={activeChar.SILENT} />      </div>
+    <div class="field-row"><span>Regent</span>      <input type="checkbox" bind:checked={activeChar.REGENT} />      </div>
+    <div class="field-row"><span>Necrobinder</span> <input type="checkbox" bind:checked={activeChar.NECROBINDER} /></div>
+    <div class="field-row"><span>Defect</span>      <input type="checkbox" bind:checked={activeChar.DEFECT} />      </div>
+</div>
+
+<button on:click={updateActiveStats} disabled={loading}>Update</button>
+
+
+<div style="flex-grow:1"></div>
+<h3>Upload Runs</h3>
+<p>Select the folder inside of 'SlayTheSpire2/steam'</p>
+<input style="margin-top:8px" type="file" bind:files={files} webkitdirectory accept=".run">
+</div>
+
 
 <main>
 <StatsC stats={activeStats} />

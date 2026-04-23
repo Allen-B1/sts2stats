@@ -84,6 +84,7 @@ export function importRun(data: any, id: number) : Run  {
     }
 
     return {
+        version: data.build_id as string,
         start: data.start_time as number,
         asc: data.ascension as number,
         players: data.players.map((player: any) => ({

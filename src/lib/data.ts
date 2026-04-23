@@ -1,5 +1,6 @@
 export interface Run {
     start: number,
+    version: string,
     asc: number,
     players: Player[],
     acts: ActID[],
@@ -69,36 +70,81 @@ export namespace RunComp {
     }
 }
 
-export type Filter = (run: Run, comp: RunComp) => number;
+export type Filter = string;
 
 export namespace Filter {
-    export function res(id: string) : Filter {
+    function isChar(run: Run, char: string) : boolean {
+        return run.players.filter(p => p.character == "CHARACTER." + char).length != 0;
+    }
+
+    export function normalize(filter: Filter) : Filter {
+        return filter.split("_").sort().join("_");
+    }
+
+    export function test(filter: Filter, run: Run) : boolean {
+        let queries = filter.split("_");
+        for (let query of queries) {
+            const parts = query.split("-");
+            const args = parts.slice(1);
+            switch (parts[0]) {
+                case "c":
+                    if (run.players.length == 1) {
+                        if (!args.map(c => "CHARACTER." + c).includes(run.players[0].character)) {
+                            return false;
+                        }
+                    } else {
+                        for (let char of args) {
+                            if (!isChar(run, char)) {
+                                return false;
+                            }
+                        }
+
+                    }
+
+                    break;
+                case "p":
+                    if (!(run.players.length == +args[0] || args[0] == "m" && run.players.length != 1)) {
+                        return false;
+                    }
+                    break;
+                case "asc":
+                    if (!args.map(Number).includes(run.asc)) {
+                        return false;
+                    }
+                    break;
+                case "act":
+                    for (let act in args) {
+                        if (!run.acts.map(s => s.split(".")[1]).includes(act)) {
+                            return false;
+                        }
+                    }
+                    break;
+                case "v":
+                    if (run.version != args[0]) {
+                        return false;
+                    }
+                    break;
+            }
+        }
+
+        return true;
+    }
+}
+
+
+export type Multiplier = (run: Run, comp: RunComp) => number;
+
+export namespace Multiplier {
+    export function res(id: string) : Multiplier {
         return (run, comp) => Run.resources(run).flat().filter(res => res.id == id).length;
     }
-    export function resAct(id: string, act: number) : Filter {
+    export function resAct(id: string, act: number) : Multiplier {
         return (run, comp) => Run.resources(run).flat().filter(res => res.id == id &&
             res.added < (comp.acts[act] || Infinity)
         ).length;
     }
-
-    export function resEasy(id: string) : Filter {
+    export function resEasy(id: string) : Multiplier {
         return (run, comp) => Run.resources(run).flat().filter(res => res.id == id && res.added < comp.adv).length;
-    }
-
-    export function asc(asc: number) : Filter {
-        return (run) => run.asc == asc ? 1 : 0;
-    }
-
-    export function players(n: number) : Filter {
-        return (run) => run.players.length == n ? 1 : 0;
-    }
-
-    export function character(char: string) : Filter {
-        return (run) => run.players.filter(p => p.character == char).length != 0 ? 1 : 0;
-    }
-
-    export function all(...filters: Filter[]) : Filter {
-        return (run, comp) => filters.find(f => !f(run, comp)) == null ? 1 : 0;
     }
 }
 
@@ -127,14 +173,14 @@ export namespace Stats {
 }
 
 export namespace Compute {
-    export function filter(runs: Run[], comps: Record<string, RunComp>, filter: Filter) : Run[] {
-        return runs.filter(run => filter(run, comps[run.start]));
+    export function filter(runs: Run[], filter: Filter) : Run[] {
+        return runs.filter(run => Filter.test(filter, run));
     }
 
-    export function stats(runs: Run[], comps: Record<string, RunComp>, filter: Filter) : Stats {
+    export function stats(runs: Run[], comps: Record<string, RunComp>, m: Multiplier) : Stats {
         const stats: Stats = Stats.empty();
         for (let run of runs) {
-            const weight = filter(run, comps[run.start]);
+            const weight = m(run, comps[run.start]);
             if (run.win) {
                 stats.wins += weight;
             }
