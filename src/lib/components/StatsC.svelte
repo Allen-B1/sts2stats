@@ -30,7 +30,6 @@
     <h3>WR | Survived</h3>
     <div class="wins">
         <div><strong title="Overall">All</strong>                   <span>{@html displayStats(stats.genStats.all)} </span></div>
-        <div><strong title="Survived 1st Hard Combat">1HC </strong> <span>{@html displayStats(stats.genStats.easy)} </span></div>
         <div><strong title="Survived Act 1">EoA1</strong>           <span>{@html displayStats(stats.genStats.act1)} </span></div>
         <div><strong title="Survived Act 2">EoA2</strong>           <span>{@html displayStats(stats.genStats.act2)} </span></div>
     </div>
