@@ -76,12 +76,13 @@
     });
 
 
-    let activePlayers: string | null = $state(null);
+    let activeDataset: "global" | "me" | "player" = "global";
+    let selectedPlayer: string | null = null;
     window.addEventListener("hashchange", function() {
         if (location.hash.slice(1).length) {
-            activePlayers = location.hash.slice(1);
+            selectedPlayer = location.hash.slice(1);
         } else {
-            activePlayers = null;
+            selectedPlayer = String(id);
         }
     });
 
@@ -115,8 +116,8 @@
 
         const filter: Filter = filters.sort().join("_");
         loading = true;
-        if (activePlayers) {
-            activeStats = await computeLocal(filter, activePlayers);
+        if (activeDataset == "me" || activeDataset == "player") {
+            activeStats = await computeLocal(filter, activeDataset == "me" ? String(id) : (selectedPlayer || String(id)));
         } else {
             activeStats = await computeGlobal(filter);
         }
@@ -171,13 +172,13 @@
 <h3>Filters</h3>
 <div class="field">
     <label style="flex-grow:1">Dataset</label>
-    <span>
-        {#if activePlayers}
-            {activePlayers.includes("-") ? "Players" : "Player"} #{activePlayers.split("-").join(", #")}
-        {:else}
-            Global
+    <select bind:value={activeDataset}>
+        <option value="global">Global</option>
+        <option value="me">My Runs</option>
+        {#if selectedPlayer}
+        <option value="player">Other</option>
         {/if}
-    </span>
+    </select>
 </div>
 <div class="field">
     <label for="asc">Ascension</label>
@@ -203,7 +204,7 @@
     <div class="field-row"><span>Defect</span>      <input type="checkbox" bind:checked={activeChar.DEFECT} />      </div>
 </div>
 
-<button on:click={updateActiveStats} disabled={loading}>Update</button>
+<button on:click={updateActiveStats} disabled={loading}>{loading ? "Loading..." : "Update"}</button>
 
 
 <div style="flex-grow:1"></div>
