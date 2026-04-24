@@ -13,13 +13,16 @@
 main { 
     display: flex;
     flex-direction: column;
-    align-items: stretch;
     gap: 16px;
-    padding: 32px;
+    padding: 0;
+    padding-top: 32px;
     flex-grow: 1;
+
+    box-sizing: border-box;
 }
 
 .panel {
+    min-height: 0;
     border-radius: 8px;
     text-align: center;
     background: hsla(0, 0%, 9%, 75%);
@@ -57,6 +60,10 @@ main {
 
 table {
     margin: auto;
+}
+td:first-child {
+    min-width: 128px;
+    text-wrap: nowrap;
 }
 td, th {
     padding: 0 16px;
@@ -103,9 +110,22 @@ h3 {
     display: flex;
     flex-direction: row;
     gap: 16px;
+    padding: 0 32px;
     align-items: stretch;
     & > * {
         flex-grow: 1;
+    }
+}
+
+.bottom-row {
+    flex-grow: 1;
+    box-sizing: border-box;
+    width: calc(100dvw - 260px - 64px - 8px);
+    overflow-x: auto;
+    padding-bottom: 32px;
+    
+    .panel {
+        min-width: 576px;
     }
 }
 
@@ -187,3 +207,50 @@ button, .input, select {
     font-size: 14px;
 }
 
+
+.fg-Common {
+    color: #fff; }
+.fg-Rare {
+    color: hsl(49, 98%, 60%); }
+.fg-Uncommon {
+    color: hsl(180, 98%, 69%); }
+.fg-Curse {
+    color: #e666fe; }
+
+.overflow {
+    overflow-y:auto;
+    overflow-x: visible;
+    box-sizing:border-box;
+    max-height: calc(100dvh - 32px - 114px - 16px - 16px - 8px);
+}
+
+
+.res {
+    position: relative;
+    .popup {
+        position: absolute;
+        display: none;
+
+        background: hsl(220, 35%, 15%);
+        padding: 8px 16px;
+        z-index: 10;
+        top: -4px;
+        left: calc(100% + 16px);
+
+        width: 256px;
+        text-wrap: wrap;
+
+        border-radius: 8px;
+    }
+    &:hover .popup {
+        display: block;
+    }
+}
+
+.fg-text-gold {
+    /* keywords */
+    font-weight: 600;
+}
+.fg-text-blue {
+    color: hsl(220, 95%, 85%);
+}

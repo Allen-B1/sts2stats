@@ -1,24 +1,37 @@
 
 <script lang="ts">
-    import { FullStats, GenStats } from "../aggregate";
+    import { FullStats, GenStats, THRESHOLD } from "../aggregate";
     import { Stats, type ResourceID } from "../data";
+    import { CARDS, RELICS, type Card, type Relic } from "../data/defs";
     import { titlecase } from "../utils";
 
     let { stats } : {
         stats: FullStats
     } = $props();
 
-    
-    function displayResource(res : ResourceID) : string {
-        return titlecase(res.split(".")[1].replaceAll("_", " "));
-    }
-
     function displayStats(stats: Stats) : string {
-        if (stats.count < 5) {
+        if (stats.count < THRESHOLD) {
             return `<span class="stats" title="${stats.count} runs">-</span>`;
         }
         return `<span class="stats" title="${stats.count} runs">` + (100*Stats.winrate(stats)).toFixed(1) + "%</span>";
     }
+
+    function displayItem(item: Card | Relic) {
+        const desc = item.description
+                .replace(/\n/g, "<br />")
+                .replace(/\[energy\:([0-9]+)\]/g, `$1 <span class="fg-text-gold">Energy</span>`)
+                .replace(/\[star\:([0-9]+)\]/g, `$1 <span class="fg-text-gold">Stars</span>`)
+                .replace(/\[\/([^\[\]]*)\]/g, `</span>`)
+                .replace(/\[([^\[\]]*)]/g, `<span class="fg-text-$1">`);
+        if (item.id == "GORGET") console.log(desc);
+        return `<span class="res">
+            <span class="fg-${item.rarity_key}">${item.name}</span>
+            <span class="popup">${desc}</span>
+        </span>`;
+    }
+
+    const displayCard = displayItem;
+    const displayRelic = displayItem;
 </script>
 
 <div class="layout-row">
@@ -46,9 +59,37 @@
 </div>
 </div>
 
-<div class="layout-row" style="flex-grow:1">
+<div class="layout-row bottom-row">
 
-<div class="panel">
+<div class="panel overflow">
+<h3>Ancient Bonuses</h3>
+<table>
+<thead>
+    <tr>
+        <th>Relic</th>
+        <th title="Acquired before 1st hard combat">1HC</th>
+        <th title="Acquired before end of Act 1">EoA1</th>
+        <th title="Acquired before end of Act 2">EoA2</th>
+        <th>All</th>
+    </tr>
+</thead>
+<tbody>
+{#each stats.relics.filter(res => RELICS[res.slice("RELIC.".length)].rarity_key == "Ancient") as res}
+    {@const stat = stats.resStats[res]}
+    {@const item = RELICS[res.slice("RELIC.".length)]}
+    <tr>
+        <td>{@html displayRelic(item)}</td>
+        <td>{@html displayStats(stat.easy)}</td>
+        <td>{@html displayStats(stat.act1)}</td>
+        <td>{@html displayStats(stat.act2)}</td>
+        <td>{@html displayStats(stat.all)}</td>
+    </tr>    
+{/each}
+</tbody>
+</table>
+</div>
+
+<div class="panel overflow">
 <h3>Relics</h3>
 <table>
 <thead>
@@ -61,10 +102,11 @@
     </tr>
 </thead>
 <tbody>
-{#each stats.relics as res}
+{#each stats.relics.filter(res => RELICS[res.slice("RELIC.".length)].rarity_key != "Ancient") as res}
     {@const stat = stats.resStats[res]}
+    {@const item = RELICS[res.slice("RELIC.".length)]}
     <tr>
-        <td>{displayResource(res)}</td>
+        <td>{@html displayRelic(item)}</td>
         <td>{@html displayStats(stat.easy)}</td>
         <td>{@html displayStats(stat.act1)}</td>
         <td>{@html displayStats(stat.act2)}</td>
@@ -75,7 +117,8 @@
 </table>
 </div>
 
-<div class="panel">
+
+<div class="panel overflow">
 <h3>Cards</h3>
 <table>
 <thead>
@@ -90,8 +133,9 @@
 <tbody>
 {#each stats.cards as res}
     {@const stat = stats.resStats[res]}
+    {@const item = CARDS[res.slice("CARD.".length)]}
     <tr>
-        <td>{displayResource(res)}</td>
+        <td>{@html displayCard(item)}</td>
         <td>{@html displayStats(stat.easy)}</td>
         <td>{@html displayStats(stat.act1)}</td>
         <td>{@html displayStats(stat.act2)}</td>

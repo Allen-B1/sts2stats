@@ -178,7 +178,7 @@ export namespace FullStats {
 
 function sortRes(res: ResourceID[], resStats: Record<ResourceID, ResStats>) : ResourceID[] {
     return res.filter(res => 
-        resStats[res].all.count >= 5
+        resStats[res].all.count >= THRESHOLD
     ).sort((a, b) => {
         const statsA = resStats[a].all;
         const statsB = resStats[b].all;
@@ -191,3 +191,5 @@ function sortRes(res: ResourceID[], resStats: Record<ResourceID, ResStats>) : Re
         return statsB.count - statsA.count;
     });
 }
+
+export const THRESHOLD = 8;

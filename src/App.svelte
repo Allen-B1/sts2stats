@@ -109,7 +109,7 @@
             filters.push("c-" + chars.join("-"));
         }
 
-        if (activeAsc != null)
+        if (activeAsc >= 0)
             filters.push("asc-" + activeAsc);
         if (activeMode != "any")
             filters.push("p-" + activeMode);
@@ -183,7 +183,7 @@
 </div>
 <div class="field">
     <label for="asc">Ascension</label>
-    <input id="asc" bind:value={activeAsc} type="number" min="0" max="10">
+    <input id="asc" bind:value={activeAsc} type="number" min="-1" max="10">
 </div>
 <div class="field">
     <label for="asc">Players</label>

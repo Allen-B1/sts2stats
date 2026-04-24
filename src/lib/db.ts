@@ -36,7 +36,7 @@ export class Database {
     }
 
     async addPlayer(item: string) {
-        await updateDoc(doc(this.db, "meta/players"), { [item]: true });
+        await setDoc(doc(this.db, "meta/players"), { [item]: true }, {merge : true});
     }  
 
     async getPlayers() : Promise<string[]> {
@@ -49,6 +49,9 @@ export class Database {
         let docs = await getDocs(query(collection(this.db, "runs-" + players)));
         let runs: Run[] = [];
         docs.forEach(doc => {
+            if (doc.id == "meta") {
+                return;
+            }
             const run = from(doc.data());
             runs.push(run);
         })
