@@ -70,6 +70,9 @@ td, th {
     padding: 0 16px;
     text-align: center;
 }
+th {
+    text-wrap: nowrap;
+}
 
 .stats {
     display: inline-block;
