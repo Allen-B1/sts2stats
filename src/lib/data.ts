@@ -120,7 +120,7 @@ export namespace Filter {
                     }
                     break;
                 case "v":
-                    if (run.version != args[0]) {
+                    if (!run.version.startsWith(args[0])) {
                         return false;
                     }
                     break;

@@ -102,6 +102,9 @@
         "NECROBINDER": true
     });
     let activeAsc = $state(10);
+    let activeVersion: string = $state("any");
+    const VERSIONS = ["v0.104", "v0.103", "v0.102", "v0.101", "v0.100"];
+
     let activeMode: "1" | "2" | "3" | "4" | "m" | "any" = $state("1");
     let activeStats: FullStats = $state(FullStats.empty());
     async function updateActiveStats() {
@@ -120,6 +123,8 @@
             filters.push("asc-" + activeAsc);
         if (activeMode != "any")
             filters.push("p-" + activeMode);
+        if (activeVersion != "any")
+            filters.push("v-" + activeVersion);
 
         const filter: Filter = filters.sort().join("_");
         loading = true;
@@ -201,6 +206,15 @@
         <option value="2">2p</option>
         <option value="3">3p</option>
         <option value="4">4p</option>
+    </select>
+</div>
+<div class="field">
+    <label for="asc">Version</label>
+    <select bind:value={activeVersion}>
+        <option value="any">Any</option>
+        {#each VERSIONS as version}
+            <option value={version}>{version}</option>
+        {/each}
     </select>
 </div>
 <div class="field large">
