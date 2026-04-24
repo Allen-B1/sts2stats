@@ -3,7 +3,6 @@
     import { FullStats, GenStats, THRESHOLD } from "../aggregate";
     import { Stats, type ResourceID } from "../data";
     import { CARDS, RELICS, type Card, type Relic } from "../data/defs";
-    import { titlecase } from "../utils";
 
     let { stats } : {
         stats: FullStats
