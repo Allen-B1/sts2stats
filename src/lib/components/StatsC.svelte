@@ -26,13 +26,14 @@
     <h3>Runs</h3>
     <p>{stats.genStats.wins.count}</p>
 </div>
-<div class="panel stat" style="flex-grow:2">
-    <h3>Win Rate</h3>
-    <p>{@html displayStats(stats.genStats.wins)}</p>
-</div>
 <div class="panel stat" style="flex-grow:1">
     <h3>Players</h3>
     <p>{stats.genStats.players ? stats.genStats.players.length : 0}</p>
+</div>
+
+<div class="panel stat" style="flex-grow:2">
+    <h3>Win Rate</h3>
+    <p>{@html displayStats(stats.genStats.wins)}</p>
 </div>
 
 <div class="panel inline" style="align-items:flex-start;flex-grow:0">
