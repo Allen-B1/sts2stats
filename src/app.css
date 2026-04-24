@@ -223,6 +223,9 @@ button, .input, select {
     color: hsl(180, 98%, 69%); }
 .fg-Curse {
     color: #e666fe; }
+.fg-Event {
+    color: hsl(130, 63%, 65%);
+}
 
 .overflow {
     overflow-y:auto;

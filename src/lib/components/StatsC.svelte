@@ -22,7 +22,6 @@
                 .replace(/\[star\:([0-9]+)\]/g, `$1 <span class="fg-text-gold">Stars</span>`)
                 .replace(/\[\/([^\[\]]*)\]/g, `</span>`)
                 .replace(/\[([^\[\]]*)]/g, `<span class="fg-text-$1">`);
-        if (item.id == "GORGET") console.log(desc);
         return `<span class="res">
             <span class="fg-${item.rarity_key}">${item.name}</span>
             <span class="popup">${desc}</span>

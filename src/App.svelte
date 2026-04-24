@@ -31,10 +31,6 @@
     $effect(() => {
         (async () => {
             if (!files || files.length == 0) {
-                loading = true;
-                await updateActiveStats();
-                loading = false;
-
                 return;
             }
     
@@ -67,6 +63,8 @@
 
             await updateActiveStats();
             loading = false;
+
+            files = null;
         })();
     })
 
@@ -76,8 +74,12 @@
             localStorage.setItem("id", id.toString());
         }
     });
-    onMount(() => {
+    onMount(async () => {
         id = +Number(localStorage.getItem("id"));
+
+        loading = true;
+        await updateActiveStats();
+        loading = false;
     });
 
 

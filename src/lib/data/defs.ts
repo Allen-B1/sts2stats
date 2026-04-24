@@ -2,6 +2,7 @@
 export interface Card {
     id: string,
     name: string,
+    cost: number,
     rarity_key: "Rare" | "Uncommon" | "Common" | "Basic" | "Event" | "Curse" | "Ancient"
     description: string
 }
