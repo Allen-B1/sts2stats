@@ -1,21 +1,21 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { Compute, Filter, RunComp, Stats, type Resource, type ResourceID, type Run } from "./lib/data";
-    import { importRun } from "./lib/import";
+    import { Filter } from "./lib/stats/run";
+    import { importRun } from "./lib/stats/import";
     import { Errors, titlecase } from "./lib/utils";
     import { derived } from "svelte/store";
     import Worker from './sw?worker';
-    import { FullStats } from "./lib/aggregate";
     import { Database } from "./lib/db";
     import StatsC from "./lib/components/StatsC.svelte";
     import type { SWReq, SWResp } from "./lib/swdefs";
     import { runTransaction } from "firebase/firestore";
+    import type { Standard } from "./lib/stats/stats";
 
     const errors = Errors.create();
     const db = new Database();
     const worker = new Worker();
 
-    function request(data: SWReq) : Promise<SWResp> {
+    function work(data: SWReq) : Promise<SWResp> {
         return new Promise((res) => {
             const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
             worker.postMessage({ reqid: id, ...data });
@@ -28,6 +28,7 @@
     }
 
     let files: FileList | null = $state(null);
+    // upload
     $effect(() => {
         (async () => {
             if (!files || files.length == 0) {
@@ -47,8 +48,9 @@
             
             await Promise.all([...files]
                 .filter(file => file.webkitRelativePath.endsWith(".run"))
-                .map(file => [file, file.text()] as [File, Promise<string>])
-                .map(async ([file, fileText]) => {
+                .map(async file => {
+                    const fileText = await file.text();
+
                     try {
                         const run = importRun(JSON.parse(await fileText), id);
                         await db.addRun(run);
@@ -69,11 +71,13 @@
     })
 
     let id: number = $state(0);
+    // update id
     $effect(() => {
         if (globalThis.localStorage && id != 0) {
             localStorage.setItem("id", id.toString());
         }
     });
+    // initialize id & initialize stats
     onMount(async () => {
         id = +Number(localStorage.getItem("id"));
 
@@ -106,7 +110,8 @@
     const VERSIONS = ["v0.104", "v0.103", "v0.102", "v0.101", "v0.100"];
 
     let activeMode: "1" | "2" | "3" | "4" | "m" | "any" = $state("1");
-    let activeStats: FullStats = $state(FullStats.empty());
+    let activeStats: Standard.Stats | null = $state(null);
+    let activePlayers: number = $state(0);
     async function updateActiveStats() {
         let filters = [];
         let chars = [];
@@ -129,27 +134,27 @@
         const filter: Filter = filters.sort().join("_");
         loading = true;
         if (activeDataset == "me" || activeDataset == "player") {
-            activeStats = await computeLocal(filter, activeDataset == "me" ? String(id) : (selectedPlayer || String(id)));
+            [activeStats, activePlayers] = await computeLocal(filter, activeDataset == "me" ? String(id) : (selectedPlayer || String(id)));
         } else {
-            activeStats = await computeGlobal(filter);
+            [activeStats, activePlayers] = await computeGlobal(filter);
         }
         loading = false;
     }
 
-    async function computeLocal(filter: Filter, players: string) : Promise<FullStats> {
+    async function computeLocal(filter: Filter, players: string) : Promise<[Standard.Stats, number]> {
         let stats = await db.getStatsLocal(filter, players);
         if (stats == null) {
             const runs = await db.getRuns(players);
-            stats = await request({ kind: "get", runs: runs, filter: filter });
+            stats = await work({ kind: "standard-compute", runs: runs, filter: filter });
             await db.addStats(players, filter, stats);
         }
-        return stats;
+        return [stats, 1];
     }
 
-    async function computeGlobal(filter: Filter) : Promise<FullStats> {
+    async function computeGlobal(filter: Filter) : Promise<[Standard.Stats, number]> {
         let globalStats = await db.getGlobalStats(filter);
         if (globalStats != null) {
-            return globalStats;
+            return [globalStats, (await db.getPlayers()).filter(p => p.indexOf("-") == -1).length];
         }
 
         const [playerss, stats] = await Promise.all([
@@ -158,19 +163,17 @@
 
         await Promise.all(playerss.map(async players => {
             if (!(players in stats)) {
-                console.log("fetching player", players);
                 const runs = await db.getRuns(players);
-                const playerStats = await request({ kind: "get", runs: runs, filter: filter });
+                const playerStats = await work({ kind: "standard-compute", runs: runs, filter: filter });
                 await db.addStats(players, filter, playerStats);
+
                 stats[players] = playerStats;
             }
         }));
 
-        console.log("global stats not saved", stats);
-
-        globalStats = await request({ kind: "aggregate", stats: Object.values(stats) });
+        globalStats = await work({ kind: "standard-combine", statss: Object.values(stats) });
         await db.setGlobalStats(filter, globalStats);
-        return globalStats;
+        return [globalStats, playerss.filter(p => p.indexOf("-") == -1).length];
     }
 </script>
 
@@ -237,8 +240,9 @@
 
 
 <main>
-<StatsC stats={activeStats} />
-
+{#if activeStats}
+<StatsC stats={activeStats} players={activePlayers} />
+{/if}
 </main>
 
 {#if $errors.msg != ""}

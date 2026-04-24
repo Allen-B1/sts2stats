@@ -1,8 +1,8 @@
 
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import { collection, deleteDoc, doc, Firestore, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, type FirestoreDataConverter } from "firebase/firestore";
-import type { Filter, Run, Stats } from "./data";
-import type { FullStats } from "./aggregate";
+import type { Filter, Run } from "./stats/run";
+import type { Standard } from "./stats/stats";
 
 function from(data: any) : Run {
     return data;
@@ -67,16 +67,16 @@ export class Database {
         }
     }
 
-    async addStats(players: string, filter: Filter, stats: FullStats) {
+    async addStats(players: string, filter: Filter, stats: Standard.Stats) {
         await setDoc(doc(collection(this.db, "stats-" + filter), players), {
             updated: Date.now(),
             ...stats
         });
     }
 
-    async getStats(filter: Filter) : Promise<Record<string, FullStats>> {
+    async getStats(filter: Filter) : Promise<Record<string, Standard.Stats>> {
         let docs = await getDocs(query(collection(this.db, "stats-" + filter)));
-        let rec: Record<string, FullStats> = {};
+        let rec: Record<string, Standard.Stats> = {};
 
         for (let d of docs.docs) {
             if (d.data().updated >= await this.getLastUpdated(d.id)) {
@@ -87,16 +87,19 @@ export class Database {
         return rec;
     }
 
-    async getStatsLocal(filter: Filter, players: string) : Promise<FullStats | null> {
+    async getStatsLocal(filter: Filter, players: string) : Promise<Standard.Stats | null> {
         const d = await getDoc(doc(this.db, `stats-${filter}/${players}`));
-        return (d.data() as any) || null;
+        if (!d.data() || d.data()!.updated < await this.getLastUpdated(d.id)) {
+            return null;
+        }
+        return (d.data() as any);
     }
 
-    async setGlobalStats(filter: Filter, stats: FullStats) {
+    async setGlobalStats(filter: Filter, stats: Standard.Stats) {
         await setDoc(doc(this.db, "global/stats-" + filter), stats);
     }
 
-    async getGlobalStats(filter: Filter) : Promise<FullStats | null> {
+    async getGlobalStats(filter: Filter) : Promise<Standard.Stats | null> {
         let data = (await getDoc(doc(this.db, "global/stats-" + filter))).data() as any;
         return data ? data : null;
     }

@@ -1,4 +1,4 @@
-import { FloorType, type Resource, type Run } from "./data";
+import { FloorType, type Resource, type Run } from "./run";
 
 
 export function importRun(data: any, id: number) : Run  {

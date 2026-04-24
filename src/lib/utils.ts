@@ -6,6 +6,10 @@ export function titlecase(s: string) {
         .join(" ");
 }
 
+export function curry<T, U, V>(f: (t: T, u: U) => V) : (t: T) => (u: U) => V {
+    return (t) => ((u) => f(t,u));
+}
+
 
 export interface Errors {
     msg: string,

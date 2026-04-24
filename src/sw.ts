@@ -1,19 +1,18 @@
-import { Compute, Filter, RunComp, type ResourceID, type Run, type Stats } from "./lib/data";
-import { FullStats } from "./lib/aggregate";
+import { Filter } from "./lib/stats/run";
+import { Standard } from "./lib/stats/stats";
 import type { SWReq } from "./lib/swdefs";
 
 self.onmessage = (msg) => {
     const data = msg.data as SWReq;
     const reqid = msg.data.reqid as string;
     switch (data.kind) {
-    case "get":
-        const filtered = Compute.filter(data.runs, data.filter);
-        self.postMessage({ reqid, result: FullStats.get(filtered) });
+    case "standard-compute":
+        const filtered = Filter.filter(data.filter, data.runs);
+        self.postMessage({ reqid, result: Standard.compute(filtered) });
         break;
-    case "aggregate":
-        self.postMessage({ reqid, result: FullStats.aggregate(data.stats) })
+    case "standard-combine":
+        self.postMessage({ reqid, result: Standard.combine(data.statss) });
         break;
     }
-
 }
 

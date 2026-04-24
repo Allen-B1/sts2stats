@@ -1,14 +1,14 @@
-import type { FullStats } from "./aggregate"
-import type { Filter, Run } from "./data"
+import type { Filter, Run } from "./stats/run"
+import type { Standard } from "./stats/stats";
 
 
 export type SWReq = {
-    kind: "get",
+    kind: "standard-compute",
     runs: Run[],
     filter: Filter
 } | {
-    kind: "aggregate",
-    stats: FullStats[]
+    kind: "standard-combine",
+    statss: Standard.Stats[]
 };
 
-export type SWResp = FullStats;
+export type SWResp = Standard.Stats;
