@@ -29,11 +29,16 @@
 
     let files: FileList | null = $state(null);
     $effect(() => {
-        console.log("uploading...");
         (async () => {
-            if (!files || !files.length) {
+            if (!files || files.length == 0) {
+                loading = true;
+                await updateActiveStats();
+                loading = false;
+
                 return;
             }
+    
+            console.log("uploading...");
 
             loading = true;
             id = Number(files[0].webkitRelativePath.split("/")[0]);
