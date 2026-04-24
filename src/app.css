@@ -25,7 +25,7 @@ main {
     min-height: 0;
     border-radius: 8px;
     text-align: center;
-    background: hsla(0, 0%, 9%, 75%);
+    background: hsla(0, 0%, 5%, 65%);
     color: #fff;
     padding: 16px 32px;
 
@@ -64,6 +64,7 @@ table {
 td:first-child {
     min-width: 128px;
     text-wrap: nowrap;
+    font-weight: 500;
 }
 td, th {
     padding: 0 16px;
@@ -208,8 +209,11 @@ button, .input, select {
 }
 
 
-.fg-Common {
-    color: #fff; }
+.fg-Common, .fg-Basic {
+    color: hsl(0, 0%, 80%); }
+.fg-Ancient {
+    font-weight: 600;
+    color: hsl(220, 100%, 95%); }
 .fg-Rare {
     color: hsl(49, 98%, 60%); }
 .fg-Uncommon {

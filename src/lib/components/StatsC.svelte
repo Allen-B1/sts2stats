@@ -65,10 +65,10 @@
 <table>
 <thead>
     <tr>
-        <th>Relic</th>
-        <th title="Acquired before 1st hard combat">1HC</th>
-        <th title="Acquired before end of Act 1">EoA1</th>
-        <th title="Acquired before end of Act 2">EoA2</th>
+        <th>Ancient Relic</th>
+        <th title="Acquired in Act 1">Act 1</th>
+        <th title="Acquired in Act 2">Act 2</th>
+        <th title="Acquired in Act 2">Act 3</th>
         <th>All</th>
     </tr>
 </thead>
@@ -78,9 +78,9 @@
     {@const item = RELICS[res.slice("RELIC.".length)]}
     <tr>
         <td>{@html displayRelic(item)}</td>
-        <td>{@html displayStats(stat.easy)}</td>
         <td>{@html displayStats(stat.act1)}</td>
         <td>{@html displayStats(stat.act2)}</td>
+        <td>{@html displayStats(stat.act3)}</td>
         <td>{@html displayStats(stat.all)}</td>
     </tr>    
 {/each}
@@ -94,9 +94,10 @@
 <thead>
     <tr>
         <th>Relic</th>
-        <th title="Acquired before 1st hard combat">1HC</th>
-        <th title="Acquired before end of Act 1">EoA1</th>
-        <th title="Acquired before end of Act 2">EoA2</th>
+        <th title="Acquired before 1st hard combat">Early</th>
+        <th title="Acquired in Act 1">Act 1</th>
+        <th title="Acquired in Act 2">Act 2</th>
+        <th title="Acquired in Act 2">Act 3</th>
         <th>All</th>
     </tr>
 </thead>
@@ -109,6 +110,7 @@
         <td>{@html displayStats(stat.easy)}</td>
         <td>{@html displayStats(stat.act1)}</td>
         <td>{@html displayStats(stat.act2)}</td>
+        <td>{@html displayStats(stat.act3)}</td>
         <td>{@html displayStats(stat.all)}</td>
     </tr>    
 {/each}
@@ -123,9 +125,10 @@
 <thead>
     <tr>
         <th>Card</th>
-        <th title="Acquired before 1st hard combat">1HC</th>
-        <th title="Acquired before end of Act 1">EoA1</th>
-        <th title="Acquired before end of Act 2">EoA2</th>
+        <th title="Acquired before 1st hard combat">Early</th>
+        <th title="Acquired in Act 1">Act 1</th>
+        <th title="Acquired in Act 2">Act 2</th>
+        <th title="Acquired in Act 2">Act 3</th>
         <th>All</th>
     </tr>
 </thead>
@@ -138,6 +141,7 @@
         <td>{@html displayStats(stat.easy)}</td>
         <td>{@html displayStats(stat.act1)}</td>
         <td>{@html displayStats(stat.act2)}</td>
+        <td>{@html displayStats(stat.act3)}</td>
         <td>{@html displayStats(stat.all)}</td>
     </tr>    
 {/each}

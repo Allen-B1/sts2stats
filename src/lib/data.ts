@@ -140,7 +140,8 @@ export namespace Multiplier {
     }
     export function resAct(id: string, act: number) : Multiplier {
         return (run, comp) => Run.resources(run).flat().filter(res => res.id == id &&
-            res.added < (comp.acts[act] || Infinity)
+            res.added >= comp.acts[act] &&
+            res.added < (comp.acts[act+1] || Infinity)
         ).length;
     }
     export function resEasy(id: string) : Multiplier {

@@ -1,4 +1,5 @@
 import { Compute, Filter, FloorType, Multiplier, Run, RunComp, Stats, type ResourceID } from "./data";
+import { RELICS } from "./data/defs";
 
 function addStats(self: Stats, other: Stats) {
     self.count += other.count;
@@ -65,6 +66,7 @@ export interface ResStats {
     easy: Stats,
     act1: Stats,
     act2: Stats,
+    act3: Stats,
     all: Stats,
 }
 
@@ -74,6 +76,7 @@ export namespace ResStats {
             easy: Stats.empty(),
             act1: Stats.empty(),
             act2: Stats.empty(),
+            act3: Stats.empty(),
             all: Stats.empty()
         }
     }
@@ -82,6 +85,7 @@ export namespace ResStats {
         addStats(self.easy, other.easy);
         addStats(self.act1, other.act1);
         addStats(self.act2, other.act2);
+        addStats(self.act3, other.act3);
         addStats(self.all, other.all);
     }
 }
@@ -107,11 +111,11 @@ export namespace FullStats {
 
 const RES_MULT: Record<keyof ResStats, (res:ResourceID) => Multiplier> = {
     "easy": Multiplier.resEasy,
-    "act1": (res: ResourceID) => Multiplier.resAct(res, 1),
-    "act2": (res: ResourceID) => Multiplier.resAct(res, 2),
+    "act1": (res: ResourceID) => Multiplier.resAct(res, 0),
+    "act2": (res: ResourceID) => Multiplier.resAct(res, 1),
+    "act3": (res: ResourceID) => Multiplier.resAct(res, 2),
     "all": Multiplier.res
 }
-
 export namespace FullStats {
     export function get(runs: Run[]) : FullStats {
         const resources = [... new Set (runs.map(run => Run.resources(run)).flat().flat().map(res => res.id))];
