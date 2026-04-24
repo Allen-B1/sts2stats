@@ -11,7 +11,8 @@ export interface GenStats {
     deathAct1: Stats,
     deathAct2: Stats,
     deathAct3: Stats,
-    wins: Stats
+    wins: Stats,
+    players: number[],
 }
 
 export namespace GenStats {
@@ -20,7 +21,8 @@ export namespace GenStats {
             deathAct1: Stats.empty(),
             deathAct2: Stats.empty(),
             deathAct3: Stats.empty(),
-            wins: Stats.empty()
+            wins: Stats.empty(),
+            players: []
         }
     }
 
@@ -29,6 +31,7 @@ export namespace GenStats {
         addStats(self.deathAct2, other.deathAct2);
         addStats(self.deathAct3, other.deathAct3);
         addStats(self.wins, other.wins);
+        self.players = [...new Set(self.players.concat(other.players))].sort()
     }
 
     export function from(run: Run, comp: RunComp) : GenStats {
@@ -48,6 +51,10 @@ export namespace GenStats {
         gs.wins.total += 1;
         if (run.win) {
             gs.wins.wins += 1;
+        }
+
+        if (run.players.length == 1) {
+            gs.players.push(run.players[0].id);
         }
 
         return gs;

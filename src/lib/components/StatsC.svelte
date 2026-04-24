@@ -1,6 +1,6 @@
 
 <script lang="ts">
-    import { FullStats } from "../aggregate";
+    import { FullStats, GenStats } from "../aggregate";
     import { Stats, type ResourceID } from "../data";
     import { titlecase } from "../utils";
 
@@ -21,12 +21,21 @@
     }
 </script>
 
-<div class="layout-row" style="align-items: center">
-<div class="panel rows">
-    <div><strong>Runs</strong> <span>{stats.genStats.wins.count}</span></div>
-    <div><strong>Win Rate</strong> {@html displayStats(stats.genStats.wins)}</div>
+<div class="layout-row">
+<div class="panel stat" style="flex-grow:1">
+    <h3>Runs</h3>
+    <p>{stats.genStats.wins.count}</p>
 </div>
-<div class="panel inline" style="align-items:flex-start">
+<div class="panel stat" style="flex-grow:1">
+    <h3>Win Rate</h3>
+    <p>{@html displayStats(stats.genStats.wins)}</p>
+</div>
+<div class="panel stat" style="flex-grow:1">
+    <h3>Players</h3>
+    <p>{stats.genStats.players ? stats.genStats.players.length : 0}</p>
+</div>
+
+<div class="panel inline" style="align-items:flex-start;flex-grow:0">
     <h3>Death Rate</h3>
     <div class="rows wins">
         <div><strong title="Overall">Act 1</strong>                   <span>{@html displayStats(stats.genStats.deathAct1)} </span></div>
@@ -36,7 +45,7 @@
 </div>
 </div>
 
-<div class="layout-row">
+<div class="layout-row" style="flex-grow:1">
 
 <div class="panel">
 <h3>Relics</h3>
