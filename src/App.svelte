@@ -195,7 +195,7 @@
 </div>
 <div class="field">
     <label for="asc">Ascension</label>
-    <input id="asc" bind:value={activeAsc} type="number" min="-1" max="10">
+    <input class="input" id="asc" bind:value={activeAsc} type="number" min="-1" max="10">
 </div>
 <div class="field">
     <label for="asc">Players</label>
@@ -231,7 +231,7 @@
 
 <div style="flex-grow:1"></div>
 <h3>Upload Runs</h3>
-<p>Select the folder inside of 'SlayTheSpire2/steam'</p>
+<p>Select the folder inside of<br />'SlayTheSpire2/steam'</p>
 <input style="margin-top:8px" type="file" bind:files={files} webkitdirectory accept=".run">
 </div>
 
