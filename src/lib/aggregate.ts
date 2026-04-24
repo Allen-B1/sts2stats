@@ -177,9 +177,9 @@ export namespace FullStats {
 }
 
 function sortRes(res: ResourceID[], resStats: Record<ResourceID, ResStats>) : ResourceID[] {
-    return res.filter(res => 
+    return [... new Set(res.filter(res => 
         resStats[res].all.count >= THRESHOLD
-    ).sort((a, b) => {
+    ))].sort((a, b) => {
         const statsA = resStats[a].all;
         const statsB = resStats[b].all;
 
