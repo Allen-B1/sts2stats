@@ -79,7 +79,9 @@ export type Target = (run: Run, cache: RunCache) => boolean;
 
 export namespace Target {
     export const win: Target = (run: Run, cache: RunCache) => run.win;
-    export const loss: Target = (run: Run, cache: RunCache) => !run.win;
+    export function lostIn(act: number) : Target {
+        return (run, cache) => cache.acts.length-1 == act && !run.win;
+    }
 }
 
 export function computeStatOne(run: Run, cache: RunCache, weight: Weight, target: Target) : Stat {
@@ -113,10 +115,10 @@ export namespace Standard {
     ];
 
     export const GEN_STATS: Schema[] = [
-        [Weight.one, Target.win],
-        [Weight.act(0), Target.loss],
-        [Weight.act(1), Target.loss],
-        [Weight.act(2), Target.loss]
+        [Weight.one,    Target.win],
+        [Weight.act(0), Target.lostIn(0)],
+        [Weight.act(1), Target.lostIn(1)],
+        [Weight.act(2), Target.lostIn(2)]
     ];
 
     export enum ResStats {
