@@ -84,41 +84,53 @@ export namespace Target {
     }
 }
 
-export function computeStatOne(run: Run, cache: RunCache, weight: Weight, target: Target) : Stat {
-    const w = weight(run, cache);
+
+export type Schema = (run: Run, cache: RunCache) => [number, number];
+
+export namespace Schema {
+    export function from(weight: Weight, target: Target) : Schema {
+        return (run: Run, cache: RunCache) => {
+            const w = weight(run, cache),
+                t = target(run, cache);
+            return [w, t ? w : 0];
+        }
+    }
+    export function pick(card: ResourceID) : Schema {
+        throw "unimplemented";
+    }
+}
+export function computeStatOne(run: Run, cache: RunCache, schema: Schema) : Stat {
+    const [w, t] = schema(run, cache);
     if (w == 0) {
         return Stat.zero();
     }
-    if (target(run, cache)) {
-        return Stat.create(w,w,1);
-    } else {
-        return Stat.create(0,w,1);
-    }
+
+    return Stat.create(t, w, 1);
 }
 
-export function computeStat(runs: Run[], caches: RunCache[], weight: Weight, target: Target) : Stat {
-    return runs.reduce((acc, run, i) => Stat.add(acc, computeStatOne(run, caches[i], weight, target)), Stat.zero())
+export function computeStat(runs: Run[], caches: RunCache[], schema: Schema) : Stat {
+    return runs.reduce((acc, run, i) => Stat.add(acc, computeStatOne(run, caches[i], schema)), Stat.zero())
 }
 
-export type Schema = [Weight, Target];
-export function computeStats(runs: Run[], caches: RunCache[], schemas: [Weight, Target][]) : Stat[] {
-    return schemas.map(schema => computeStat(runs, caches, schema[0], schema[1]));
+export function computeStats(runs: Run[], caches: RunCache[], schemas: Schema[]) : Stat[] {
+    return schemas.map(schema => computeStat(runs, caches, schema));
 }
+
 
 export namespace Standard {
     export const RES_STATS = (res: ResourceID) : Schema[] => [
-        [Weight.resource(res), Target.win],
-        [Weight.resourceAct(res, 0), Target.win],
-        [Weight.resourceAct(res, 1), Target.win],
-        [Weight.resourceAct(res, 2), Target.win],
-        [Weight.resourceEasy(res), Target.win],
+        Schema.from(Weight.resource(res), Target.win),
+        Schema.from(Weight.resourceAct(res, 0), Target.win),
+        Schema.from(Weight.resourceAct(res, 1), Target.win),
+        Schema.from(Weight.resourceAct(res, 2), Target.win),
+        Schema.from(Weight.resourceEasy(res), Target.win),
     ];
 
-    export const GEN_STATS: Schema[] = [
-        [Weight.one,    Target.win],
-        [Weight.act(0), Target.lostIn(0)],
-        [Weight.act(1), Target.lostIn(1)],
-        [Weight.act(2), Target.lostIn(2)]
+    export const GEN_STATS : Schema[] = [
+        Schema.from(Weight.one,    Target.win),
+        Schema.from(Weight.act(0), Target.lostIn(0)),
+        Schema.from(Weight.act(1), Target.lostIn(1)),
+        Schema.from(Weight.act(2), Target.lostIn(2))
     ];
 
     export enum ResStats {
