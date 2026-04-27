@@ -106,7 +106,7 @@
         "NECROBINDER": true
     });
     let activeAsc = $state(10);
-    let activeVersion: string = $state("any");
+    let activeVersion: string = $state("v0.104");
     const VERSIONS = ["v0.104", "v0.103", "v0.102", "v0.101", "v0.100"];
 
     let activeMode: "1" | "2" | "3" | "4" | "m" | "any" = $state("1");
