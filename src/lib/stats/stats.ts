@@ -107,6 +107,21 @@ export namespace Schema {
             }
         }
     }
+
+    export function pickAct(res: ResourceID, act: number) : Schema {
+        return (run: Run, cache: RunCache) => {
+            try {
+                const rewards = Run.rewards(run).flat().filter(reward => reward.resource == res &&
+                    reward.floor >= cache.acts[act] && reward.floor < (cache.acts[act+1] || Infinity)
+                );
+                
+                return [rewards.length, rewards.filter(reward => reward.picked).length];
+            } catch(err) {
+                console.log(run);
+                throw err;
+            }
+        }
+    }
 }
 export function computeStatOne(run: Run, cache: RunCache, schema: Schema) : Stat {
     const [w, t] = schema(run, cache);
@@ -132,7 +147,10 @@ export namespace Standard {
         Schema.from(Weight.resourceAct(res, 1), Target.win),
         Schema.from(Weight.resourceAct(res, 2), Target.win),
         Schema.from(Weight.resourceEasy(res), Target.win),
-        Schema.pick(res)
+        Schema.pick(res),
+        Schema.pickAct(res, 0),
+        Schema.pickAct(res, 1),
+        Schema.pickAct(res, 2)
     ];
 
     export const GEN_STATS : Schema[] = [
@@ -143,7 +161,8 @@ export namespace Standard {
     ];
 
     export enum ResStats {
-        ANY, ACT1, ACT2, ACT3, EASY, PICK
+        ANY, ACT1, ACT2, ACT3, EASY,
+        PICK, PICK_ACT1, PICK_ACT2, PICK_ACT3
     }
 
     export enum GenStats {

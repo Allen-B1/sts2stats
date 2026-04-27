@@ -10,16 +10,6 @@
     flex-direction: row;
     height: 100%;
 }
-main { 
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 0;
-    padding-top: 32px;
-    flex-grow: 1;
-
-    box-sizing: border-box;
-}
 
 .panel {
     min-height: 0;
@@ -58,22 +48,6 @@ main {
     }
 }
 
-table {
-    margin: auto;
-}
-td:first-child {
-    min-width: 128px;
-    text-wrap: nowrap;
-    font-weight: 500;
-}
-td, th {
-    padding: 0 16px;
-    text-align: center;
-}
-th {
-    text-wrap: nowrap;
-}
-
 .stats {
     display: inline-block;
     text-align: center;
@@ -88,10 +62,6 @@ th {
     }
 }
 
-[colspan] {
-    padding-top: 8px;
-    font-size: 20px;
-}
 
 .error {
     position: fixed;
@@ -114,27 +84,9 @@ h3 {
     display: flex;
     flex-direction: row;
     gap: 16px;
-    padding: 0 32px;
     align-items: stretch;
     & > * {
         flex-grow: 1;
-    }
-}
-
-.bottom-row {
-    flex-grow: 1;
-    box-sizing: border-box;
-    width: calc(100dvw - 260px - 64px - 8px);
-    overflow-x: auto;
-    padding-bottom: 32px;
-    
-    .panel {
-        min-width: 640px;
-        padding: 16px 0;
-    }
-
-    .panel.big {
-        min-width: 720px;
     }
 }
 
@@ -190,7 +142,7 @@ label {
     }
 }
 
-button, select, ::file-selector-button {
+.button, select, ::file-selector-button {
     border-radius: 4px;
     border: 0;
     background: hsl(220, 35%, 25%);
@@ -211,8 +163,10 @@ select:focus:hover {
     background: hsl(220, 35%, 20%);
 }
 
-button, .input, select, ::file-selector-button {
+button, .input, select, ::file-selector-button, .radiobutton label {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: normal;
+    color: #fff;
     padding: 4px 8px;
     font-size: 14px; }
 .input {
@@ -229,25 +183,26 @@ button, .input, select, ::file-selector-button {
 
 .fg-Common, .fg-Basic {
     color: hsl(0, 0%, 80%); }
+.bg-Common {
+    background: hsl(0, 0%, 80%) !important; }
 .fg-Ancient {
     font-weight: 600;
     color: hsl(220, 100%, 95%); }
 .fg-Rare {
     color: hsl(49, 98%, 60%); }
+.bg-Rare {
+    background: hsl(49, 98%, 60%) !important; }
 .fg-Uncommon {
     color: hsl(180, 98%, 69%); }
+.bg-Uncommon {
+    background: hsl(180, 98%, 69%) !important; }
 .fg-Curse {
     color: #e666fe; }
+.bg-Curse { background: #e666fe !important; }
 .fg-Event {
-    color: hsl(130, 63%, 65%);
-}
-
-.overflow {
-    overflow-y:auto;
-    overflow-x: visible;
-    box-sizing:border-box;
-    max-height: calc(100dvh - 32px - 114px - 16px - 16px - 8px);
-}
+    color: hsl(130, 63%, 65%); }
+.bg-Event {
+    background: hsl(130, 63%, 65%) !important; }
 
 
 .res {
@@ -278,4 +233,43 @@ button, .input, select, ::file-selector-button {
 }
 .fg-text-blue {
     color: hsl(220, 95%, 85%);
+}
+
+.radiobutton {
+    border-radius: 4px;
+    border: 0;
+    background: hsl(220, 35%, 25%);
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    flex-direction: row;
+    gap: 0;
+    padding: 0;
+    
+    label {
+        padding: 4px 16px;
+        background: hsl(220, 35%, 25%);
+        cursor: pointer;
+    }
+    :first-child + label {
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+    }
+    label:last-child {
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px; }
+    input:checked + label {
+        background: hsl(220, 35%, 15%);
+    }
+    label:active {
+        background: hsl(220, 35%, 20%);
+    }
+
+    input {
+        display: none;
+    }
+}
+
+.sep {
+    flex-grow: 1;
 }

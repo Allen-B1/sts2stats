@@ -6,7 +6,7 @@
     import { derived } from "svelte/store";
     import Worker from './sw?worker';
     import { Database } from "./lib/db";
-    import StatsC from "./lib/components/StatsC.svelte";
+    import StatsC from "./lib/components/StatsView.svelte";
     import type { SWReq, SWResp } from "./lib/swdefs";
     import { runTransaction } from "firebase/firestore";
     import type { Standard } from "./lib/stats/stats";
@@ -229,7 +229,7 @@
     <div class="field-row"><span>Defect</span>      <input type="checkbox" bind:checked={activeChar.DEFECT} />      </div>
 </div>
 
-<button on:click={updateActiveStats} disabled={loading}>{loading ? "Loading..." : "Update"}</button>
+<button class="button" on:click={updateActiveStats} disabled={loading}>{loading ? "Loading..." : "Update"}</button>
 
 <div style="flex-grow:1"></div>
 <h3>Upload Runs</h3>
@@ -237,12 +237,9 @@
 <input style="margin-top:8px" type="file" bind:files={files} webkitdirectory accept=".run">
 </div>
 
-
-<main>
 {#if activeStats}
 <StatsC stats={activeStats} players={activePlayers} />
 {/if}
-</main>
 
 {#if $errors.msg != ""}
     <div class="error">{$errors.msg} <span class="time">{Errors.countdown($errors)}</span></div>
