@@ -95,8 +95,17 @@ export namespace Schema {
             return [w, t ? w : 0];
         }
     }
-    export function pick(card: ResourceID) : Schema {
-        throw "unimplemented";
+    export function pick(res: ResourceID) : Schema {
+        return (run: Run, cache: RunCache) => {
+            try {
+                const rewards = Run.rewards(run).flat().filter(reward => reward.resource == res);
+                
+                return [rewards.length, rewards.filter(reward => reward.picked).length];
+            } catch(err) {
+                console.log(run);
+                throw err;
+            }
+        }
     }
 }
 export function computeStatOne(run: Run, cache: RunCache, schema: Schema) : Stat {
@@ -116,7 +125,6 @@ export function computeStats(runs: Run[], caches: RunCache[], schemas: Schema[])
     return schemas.map(schema => computeStat(runs, caches, schema));
 }
 
-
 export namespace Standard {
     export const RES_STATS = (res: ResourceID) : Schema[] => [
         Schema.from(Weight.resource(res), Target.win),
@@ -124,6 +132,7 @@ export namespace Standard {
         Schema.from(Weight.resourceAct(res, 1), Target.win),
         Schema.from(Weight.resourceAct(res, 2), Target.win),
         Schema.from(Weight.resourceEasy(res), Target.win),
+        Schema.pick(res)
     ];
 
     export const GEN_STATS : Schema[] = [
@@ -134,7 +143,7 @@ export namespace Standard {
     ];
 
     export enum ResStats {
-        ANY, ACT1, ACT2, ACT3, EASY
+        ANY, ACT1, ACT2, ACT3, EASY, PICK
     }
 
     export enum GenStats {

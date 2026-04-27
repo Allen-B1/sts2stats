@@ -132,6 +132,10 @@ h3 {
         min-width: 640px;
         padding: 16px 0;
     }
+
+    .panel.big {
+        min-width: 720px;
+    }
 }
 
 .rows strong {

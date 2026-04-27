@@ -1,4 +1,4 @@
-import { FloorType, type Resource, type Run } from "./run";
+import { FloorType, type Resource, type Reward, type Run } from "./run";
 
 
 export function importRun(data: any, id: number) : Run  {
@@ -83,6 +83,52 @@ export function importRun(data: any, id: number) : Run  {
         data.players[0].id = id;
     }
 
+    const floors: any[] = data.map_point_history.flat();
+    let rewards: Record<`rewards-${number}`, Reward[]> = {};
+    for (let floorNum = 0; floorNum < floors.length; floorNum++) {
+        const floor = floors[floorNum];
+
+        if (floor.map_point_type == "shop") {
+            continue;
+        }
+
+        if (floor.player_stats) for (let i = 0; i < floor.player_stats.length; i++) {
+            rewards[`rewards-${i}`] = rewards[`rewards-${i}`] || [];
+            const playerStats = floor.player_stats[i];
+            const playerRewards = rewards[`rewards-${i}`];
+
+            if (playerStats.card_choices) {
+                playerRewards.push(...playerStats.card_choices.map((choice: any) => ({
+                    floor: floorNum,
+                    resource: choice.card.id,
+                    picked: choice.was_picked
+                })));
+            }
+
+            if (playerStats.ancient_choice) {
+                playerRewards.push(...playerStats.ancient_choice.map((choice: any) => ({
+                    resource: `RELIC.${choice.TextKey}`,
+                    floor: floorNum,
+                    picked: choice.was_chosen
+                })));
+            }
+
+            if (floor.rooms && floor.rooms[0] && floor.rooms[0].model_id == "EVENT.WOOD_CARVINGS") {
+                playerRewards.push({
+                    resource: "CARD.TORIC_TOUGHNESS",
+                    picked: Boolean(playerStats.cards_transformed && playerStats.cards_transformed[0].final_card.id == "CARD.TORIC_TOUGHNESS"),
+                    floor: floorNum
+                });
+
+                playerRewards.push({
+                    resource: "CARD.PECK",
+                    picked: Boolean(playerStats.cards_transformed && playerStats.cards_transformed[0].final_card.id == "CARD.PECK"),
+                    floor: floorNum
+                });
+            }
+        }
+    }
+
     return {
         version: data.build_id as string,
         start: data.start_time as number,
@@ -130,6 +176,8 @@ export function importRun(data: any, id: number) : Run  {
                 out[`resources-${i}`] = Object.values(resources[i]).flat();
             }
             return out;
-        })()
+        })(),
+
+        ...rewards
     }
 }

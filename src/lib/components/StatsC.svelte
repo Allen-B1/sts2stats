@@ -89,6 +89,7 @@
         <th title="Acquired in Act 2">Act 2</th>
         <th title="Acquired in Act 2">Act 3</th>
         <th>All</th>
+        <th>Pick %</th>
     </tr>
 </thead>
 <tbody>
@@ -100,6 +101,7 @@
         <td>{@html displayStats(rstats[Standard.ResStats.ACT2])}</td>
         <td>{@html displayStats(rstats[Standard.ResStats.ACT3])}</td>
         <td>{@html displayStats(rstats[Standard.ResStats.ANY])}</td>
+        <td>{@html displayStats(rstats[Standard.ResStats.PICK])}</td>
     </tr>    
 {/each}
 </tbody>
@@ -136,7 +138,7 @@
 </div>
 
 
-<div class="panel overflow">
+<div class="panel overflow big">
 <h3>Cards</h3>
 <table>
 <thead>
@@ -147,6 +149,7 @@
         <th title="Acquired in Act 2">Act 2</th>
         <th title="Acquired in Act 2">Act 3</th>
         <th>All</th>
+        <th>Pick %</th>
     </tr>
 </thead>
 <tbody>
@@ -159,6 +162,7 @@
         <td>{@html displayStats(rstats[Standard.ResStats.ACT2])}</td>
         <td>{@html displayStats(rstats[Standard.ResStats.ACT3])}</td>
         <td>{@html displayStats(rstats[Standard.ResStats.ANY])}</td>
+        <td>{@html displayStats(rstats[Standard.ResStats.PICK])}</td>
     </tr>    
 {/each}
 </tbody>

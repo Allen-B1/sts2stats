@@ -7,12 +7,17 @@ export interface Run {
 
     win: boolean,
     [key: `resources-${number}`]: Resource[],
+    [key: `rewards-${number}`] : Reward[]
     floors: Floor[],
 }
 
 export namespace Run {
     export function resources(run: Run) : Resource[][] {
-        return run.players.map((_, i) => run[`resources-${i}`]);
+        return run.players.map((_, i) => run[`resources-${i}`] || []);
+    }
+
+    export function rewards(run: Run) : Reward[][] {
+        return run.players.map((_, i) => run[`rewards-${i}`] || []);
     }
 }
 
@@ -37,6 +42,12 @@ export interface Floor {
 }
 
 export type FloorID = string;
+
+export interface Reward {
+    resource: ResourceID,
+    picked: boolean,
+    floor: number
+}
 
 export enum FloorType {
     ANCIENT,
