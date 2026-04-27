@@ -43,10 +43,10 @@
     let activeChar: string = $state("any");
     const filteredCards = $derived(cards
         .filter(res => (CARDS[res.slice(5)] && CARDS[res.slice(5)].color == activeChar) || activeChar == "any")
-        .filter(res => cardDisp == "scatter" ? Stat.runs(stats[res][Standard.ResStats.PICK]) > 1 : true)
+        .filter(res => disp == "scatter" ? Stat.runs(stats[res][Standard.ResStats.PICK]) > 1 : true)
     );
 
-    let cardDisp: "table" | "scatter" = $state("scatter");
+    let disp: "table" | "scatter" = $state("scatter");
 </script>
 
 
@@ -91,13 +91,29 @@
 
 {#snippet ancientSnippet()}
 <div class="background">
+<div class="small-row">
+<div class="radiobutton">
+    <input type="radio" value={"scatter"} id="ancientdisp-radio-scatter" name="ancientdisp" bind:group={disp}>
+    <label for="ancientdisp-radio-scatter">Plot</label>
+
+    <input type="radio" value={"table"} id="ancientdisp-radio-table" name="ancientdisp" bind:group={disp}>
+    <label for="ancientdisp-radio-table">Table</label>
+</div>
+<div class="sep"></div>
 <select bind:value={activeAncient}>
     <option value="any">Any</option>
     {#each Object.values(ANCIENTS) as ancient}
     <option value={ancient.id}>{ancient.name}</option>
     {/each}
 </select>
+</div>
 
+{#if disp == "scatter"}
+<Plot points={filteredAncients.map(card => [
+    Stat.ratio(stats[card][Standard.ResStats.PICK]), 
+    Stat.ratio(stats[card][Standard.ResStats.ANY])
+])} resources={filteredAncients} />
+{:else}
 <Table title="Ancient Relic" resources={filteredAncients} stats={stats} display={[
     [Standard.ResStats.ANY, "Win%"],
     [Standard.ResStats.ACT1, "Win% Act 1"],
@@ -108,6 +124,7 @@
     [Standard.ResStats.PICK_ACT2, "Pick% Act 2"],
     [Standard.ResStats.PICK_ACT3, "Pick% Act 3"],
 ]} />
+{/if}
 </div>    
 {/snippet}
 
@@ -128,10 +145,10 @@
 
 <div class="small-row">
 <div class="radiobutton">
-    <input type="radio" value={"scatter"} id="carddisp-radio-scatter" name="carddisp" bind:group={cardDisp}>
+    <input type="radio" value={"scatter"} id="carddisp-radio-scatter" name="carddisp" bind:group={disp}>
     <label for="carddisp-radio-scatter">Plot</label>
 
-    <input type="radio" value={"table"} id="carddisp-radio-table" name="carddisp" bind:group={cardDisp}>
+    <input type="radio" value={"table"} id="carddisp-radio-table" name="carddisp" bind:group={disp}>
     <label for="carddisp-radio-table">Table</label>
 </div>
 <div class="sep"></div>
@@ -148,7 +165,7 @@
 </select>
 </div>
 
-{#if cardDisp == "scatter"}
+{#if disp == "scatter"}
 <Plot points={filteredCards.map(card => [
     Stat.ratio(stats[card][Standard.ResStats.PICK]), 
     Stat.ratio(stats[card][Standard.ResStats.ANY])
