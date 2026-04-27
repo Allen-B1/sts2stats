@@ -38,6 +38,8 @@
 
     function displayItem(id: ResourceID) {
         const item = id.startsWith("CARD.") ? CARDS[id.slice("CARD.".length)] : RELICS[id.slice("RELIC.".length)];
+        if (!item) 
+            return `<span class="res">${id}</span>`;
 
         const desc = (item.description || "")
                 .replace(/\n/g, "<br />")
