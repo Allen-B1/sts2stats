@@ -39,14 +39,14 @@
     function displayItem(id: ResourceID) {
         const item = id.startsWith("CARD.") ? CARDS[id.slice("CARD.".length)] : RELICS[id.slice("RELIC.".length)];
 
-        const desc = item.description
+        const desc = (item.description || "")
                 .replace(/\n/g, "<br />")
                 .replace(/\[energy\:([0-9]+)\]/g, `$1 <span class="fg-text-gold">Energy</span>`)
                 .replace(/\[star\:([0-9]+)\]/g, `$1 <span class="fg-text-gold">Stars</span>`)
                 .replace(/\[\/([^\[\]]*)\]/g, `</span>`)
                 .replace(/\[([^\[\]]*)]/g, `<span class="fg-text-$1">`);
         return `<span class="res">
-            <span class="fg-${item.rarity_key}">${item.name}</span>
+            <span class="fg-${item.rarity_key}">${item.name || id}</span>
             <span class="popup">${desc}</span>
         </span>`;
     }
