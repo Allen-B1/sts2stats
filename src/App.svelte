@@ -39,6 +39,7 @@
 
             loading = true;
             id = Number(files[0].webkitRelativePath.split("/")[0]);
+            console.log(files[0].webkitRelativePath, "new id: " + id);
             if (!Number.isInteger(id) || id < 10) {
                 Errors.show(errors, "Invalid folder. Select the folder whose name is a large integer.");
                 return;
@@ -177,10 +178,10 @@
         let stats = await db.getStatsLocal(filter, players);
         if (stats == null) {
             const runs = await db.getRuns(players);
+            console.log(runs[0]);
             stats = await work({ kind: "standard-compute", runs: runs, filter: filter });
             await db.addStats(players, filter, stats);
         }
-        console.log(stats);
         return [stats, players.split("-").length];
     }
 
@@ -232,7 +233,7 @@
         <option value="global">Global</option>
         <option value="me">My Runs</option>
         {#if activeDataset == "player"}
-        <option value="player">Player {selectedPlayer?.split("-").map(a => a.slice(-3)).join(" and ")}'s Runs</option>
+        <option value="player">Player {selectedPlayer?.split("-").map(a => a.slice(-4, -1)).join(" and ")}'s Runs</option>
         {/if}
     </select>
 </div>

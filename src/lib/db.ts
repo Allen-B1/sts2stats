@@ -63,7 +63,7 @@ export class Database {
         if (!data) {
             return Infinity;
         } else {
-            return Number(data);
+            return Number(data.updated) || Infinity;
         }
     }
 
@@ -79,7 +79,8 @@ export class Database {
         let rec: Record<string, Standard.Stats> = {};
 
         for (let d of docs.docs) {
-            if (d.data().updated >= await this.getLastUpdated(d.id)) {
+            const lastUpdated = await this.getLastUpdated(d.id);
+            if (d.data().updated >= lastUpdated) {
                 rec[d.id] = d.data() as any;
             }
         }
@@ -89,7 +90,8 @@ export class Database {
 
     async getStatsLocal(filter: Filter, players: string) : Promise<Standard.Stats | null> {
         const d = await getDoc(doc(this.db, `stats-${filter}/${players}`));
-        if (!d.data() || d.data()!.updated < await this.getLastUpdated(d.id)) {
+        const lastUpdated = await this.getLastUpdated(d.id);
+        if (!d.data() || d.data()!.updated < lastUpdated) {
             return null;
         }
         return (d.data() as any);
