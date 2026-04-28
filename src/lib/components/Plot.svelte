@@ -31,9 +31,10 @@
     <div class="plot">
         {#each points as point, i}
             {@const transformed = transform(point)}
-            {@const side =  transformed[1] + POINT_SIZE/2 >= SIZE - 128 ? "top" :
-                            transformed[0] + POINT_SIZE/2 >= SIZE - 128 ? "left" : 
-                            transformed[0] + POINT_SIZE/2 < 128 ? "right" : "bottom"}
+            {@const side =  transformed[0] + POINT_SIZE/2 >= SIZE - 128 ? "left" : 
+                            transformed[0] + POINT_SIZE/2 <= 128        ? "right" : 
+                            transformed[1] + POINT_SIZE/2 >= SIZE - 128 ? "top" :
+                            transformed[1] + POINT_SIZE/2 <= 128        ? "bottom" :"right"}
             {@const item = getItem(resources[i])}
             <div class="point bg-{item && item.rarity_key}" style="top:{transformed[1]}px;left:{transformed[0]}px;">
                 {#if item}
@@ -87,11 +88,9 @@
         }
         .left {
             right: 32px;
-            top: calc(-128px - 8px);
         }
         .right {
             left: 32px;
-            top: calc(-128px - 8px);
         }
         .top {
             bottom: 32px;

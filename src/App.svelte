@@ -152,6 +152,8 @@
             location.hash = "#" + id;
         } else if (activeDataset == "global") {
             location.hash = "#";
+        } else if (activeDataset == "player") {
+            location.hash = "#" + selectedPlayer;
         }
 
         let filters = [];
