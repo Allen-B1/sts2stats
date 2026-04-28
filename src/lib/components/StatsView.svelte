@@ -214,7 +214,7 @@
     .background {
         padding: 16px 0;
         overflow: auto;
-        background: hsla(0, 0%, 5%, 65%);
+        background: hsla(0, 0%, 5%, 75%);
         display: flex;
         flex-direction: column;
         gap: 16px;
