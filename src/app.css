@@ -4,6 +4,8 @@
     color: #fff;
     margin: 0; padding: 0;
     height: 100%;
+
+    --panel-bg: hsla(0, 0%, 5%, 75%);
 }
 #app {
     display: flex;
@@ -15,7 +17,7 @@
     min-height: 0;
     border-radius: 16px;
     text-align: center;
-    background: hsla(0, 0%, 5%, 75%);
+    background: var(--panel-bg);
     color: #fff;
     padding: 16px 32px;
 
@@ -78,7 +80,8 @@ h3 {
 }
 
 .sidebar {
-    width: 320px;
+    width: 300px;
+    flex-shrink: 0;
     padding: 16px;
     background: hsl(220, 35%, 15%);
     display: flex; flex-direction: column;

@@ -53,6 +53,7 @@
 <Tabs tabs={[overview, cardSnippet, relicSnippet, ancientSnippet]} names={["Overview", "Cards", "Relics", "Ancients"]} />
 
 {#snippet overview()}
+<div class="data-container">
 <main>
     <div class="panel stat" id="panel-runs">
         <h4>Runs</h4>
@@ -70,16 +71,16 @@
 
     <div class="panel" id="panel-dr-act">
         <h3>Death Rate by Act</h3>
-        <div class="wins">
-            <strong title="Overall">Act 1</strong>                  <span>{@html displayStats(stats.gen[Standard.GenStats.ACT1])} </span>
-            <strong title="Survived Act 1">Act 2</strong>           <span>{@html displayStats(stats.gen[Standard.GenStats.ACT2])} </span>
-            <strong title="Survived Act 2">Act 3</strong>           <span>{@html displayStats(stats.gen[Standard.GenStats.ACT3])} </span>
+        <div class="wins-flex">
+            <div><strong title="Overall">Act 1</strong>                  <span>{@html displayStats(stats.gen[Standard.GenStats.ACT1])} </span></div>
+            <div><strong title="Survived Act 1">Act 2</strong>           <span>{@html displayStats(stats.gen[Standard.GenStats.ACT2])} </span></div>
+            <div><strong title="Survived Act 2">Act 3</strong>           <span>{@html displayStats(stats.gen[Standard.GenStats.ACT3])} </span></div>
         </div>
     </div>
 
     <div class="panel" id="panel-wr-char">
         <h3>Win Rate by Character</h3>
-        <div class="wins-flex">
+        <div class="wins-flex chars">
             {#each [Standard.GenStats.IRONCLAD, Standard.GenStats.SILENT, Standard.GenStats.REGENT, Standard.GenStats.NECROBINDER, Standard.GenStats.DEFECT] as charIdx}
             {@const name = Standard.GenStats[charIdx]}
             <div>
@@ -92,12 +93,13 @@
 
     <div class="panel" id="panel-wr-act">
         <h3>Win Rate by Alternate Act</h3>
-        <div class="wins">
-            <strong>Overgrowth</strong> <span>{@html displayStats(stats.gen[Standard.GenStats.OVERGROWTH])}</span>
-            <strong>Underdocks</strong> <span>{@html displayStats(stats.gen[Standard.GenStats.UNDERDOCKS])}</span>
+        <div class="wins-flex">
+            <div><strong>Overgrowth</strong> <span>{@html displayStats(stats.gen[Standard.GenStats.OVERGROWTH])}</span></div>
+            <div><strong>Underdocks</strong> <span>{@html displayStats(stats.gen[Standard.GenStats.UNDERDOCKS])}</span></div>
         </div>
     </div>
 </main>
+</div>
 {/snippet}
 
 {#snippet ancientSnippet()}
@@ -119,6 +121,7 @@
 </select>
 </div>
 
+<div class="data-container">
 {#if disp == "scatter"}
 <Plot points={filteredAncients.map(card => [
     Stat.ratio(stats[card][Standard.ResStats.PICK]), 
@@ -136,11 +139,13 @@
     [Standard.ResStats.PICK_ACT3, "Pick% Act 3"],
 ]} />
 {/if}
+</div>
+
 </div>    
 {/snippet}
 
 {#snippet relicSnippet()}
-<div class="background">
+<div class="data-container">
 <Table title="Relic" resources={relics} stats={stats} display={[
     [Standard.ResStats.ANY, "Win%"],
     [Standard.ResStats.EASY, "Win% Easy"],
@@ -149,6 +154,7 @@
     [Standard.ResStats.ACT3, "Win% Act 3"],
 ]} />
 </div>
+
 {/snippet}
 
 {#snippet cardSnippet()}
@@ -176,6 +182,7 @@
 </select>
 </div>
 
+<div class="data-container">
 {#if disp == "scatter"}
 <Plot points={filteredCards.map(card => [
     Stat.ratio(stats[card][Standard.ResStats.PICK]), 
@@ -195,6 +202,8 @@
 ]} />
 {/if}
 </div>
+
+</div>
 {/snippet}
 
 
@@ -205,23 +214,9 @@
         grid-template-columns: repeat(6, 1fr);
 
         gap: 16px;
-        padding: 32px;
         flex-grow: 0;
 
         box-sizing: border-box;
-    }
-
-    .background {
-        padding: 16px 0;
-        overflow: auto;
-        background: hsla(0, 0%, 5%, 75%);
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        align-items: center;
-        flex-grow: 1;
-
-        justify-content: start;
     }
 
     .small-row {
@@ -247,8 +242,10 @@
     .wins-flex {
         display: flex;
         flex-direction: row;
+
         justify-content: center;
         align-items: center;
+
         column-gap: 32px;
         row-gap: 16px;
         flex-wrap: wrap;
@@ -257,7 +254,11 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            flex-grow: 1;
+        }
+        &.chars > div {
             min-width: 27%;
+            flex-grow: 0;
         }
     }
 
@@ -319,5 +320,47 @@
         #panel-dr-act { grid-row: 2; grid-column: 1 / span 6; }
         #panel-wr-act { grid-row: 3; grid-column: 1 / span 6; }
         #panel-wr-char { grid-row: 4; grid-column: 1 / span 6; }
+    }
+
+    @media (width <= 512px) {
+        #panel-runs    { grid-row: 1; grid-column: 1 / span 3; }
+        #panel-players { grid-row: 1; grid-column: 4 / span 3; }
+        #panel-winrate { grid-row: 2; grid-column: 1 / span 6; }
+        #panel-dr-act  { grid-row: 3; grid-column: 1 / span 6; }
+        #panel-wr-act  { grid-row: 4; grid-column: 1 / span 6; }
+        #panel-wr-char { grid-row: 5; grid-column: 1 / span 6; }
+
+        .wins-flex {
+            flex-direction: column;
+            gap: 32px;
+        }
+    }
+
+    .background {
+        padding: 16px 0;
+        padding-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        align-items: center;
+        flex-grow: 1;
+
+        justify-content: start;
+
+        max-width: 100vw;
+        overflow: visible;
+    }
+
+    .data-container {
+        box-sizing: border-box;
+        max-width: 100dvw;
+        max-height: calc(100dvh - 45px);
+        overflow: auto;
+        padding: 32px;
+        flex-grow: 1;
+    }
+    .background .data-container {
+        padding-top: 0;
+        max-height: calc(100dvh - 45px - 28px - 32px);
     }
 </style>

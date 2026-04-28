@@ -26,27 +26,31 @@
     }
 </script>
 
-<div class="plot">
-    {#each points as point, i}
-        {@const transformed = transform(point)}
-        {@const item = getItem(resources[i])}
-        <div class="point bg-{item && item.rarity_key}" style="top:{transformed[1]}px;left:{transformed[0]}px;">
-            {#if item}
-                <div class="popup">
-                    <h6>{item.name}</h6>
-                    <p>Win: {(100*point[1]).toFixed(1)}% | Pick: {(100*point[0]).toFixed(1)}%</p>
-                    <p>{@html displayText(item.description || "")}</p>
-                </div>
-            {/if}
-        </div>
-    {/each}
-</div>
+    <div class="plot">
+        {#each points as point, i}
+            {@const transformed = transform(point)}
+            {@const item = getItem(resources[i])}
+            <div class="point bg-{item && item.rarity_key}" style="top:{transformed[1]}px;left:{transformed[0]}px;">
+                {#if item}
+                    <div class="popup">
+                        <h6>{item.name}</h6>
+                        <p>Win: {(100*point[1]).toFixed(1)}% | Pick: {(100*point[0]).toFixed(1)}%</p>
+                        <p>{@html displayText(item.description || "")}</p>
+                    </div>
+                {/if}
+            </div>
+        {/each}
+    </div>
+
 
 <style>
     .plot {
         width: 768px;
         height: 768px;
         position: relative;
+
+        background: var(--panel-bg);
+        border-radius: 16px;
     }
 
     .point {

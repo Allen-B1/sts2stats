@@ -175,6 +175,8 @@
         await db.setGlobalStats(filter, globalStats);
         return [globalStats, playerss.filter(p => p.indexOf("-") == -1).length];
     }
+
+    let sidebarOpen = $state(false);
 </script>
 
 
@@ -187,7 +189,7 @@
 </svelte:head>
 
 <label for="sidebar-open" id="sidebar-open-label">≡</label>
-<input type="checkbox" id="sidebar-open">
+<input type="checkbox" id="sidebar-open" bind:checked={sidebarOpen}>
 
 <div class="sidebar">
 <h3>Filters</h3>
@@ -234,7 +236,7 @@
     <div class="field-row"><span>Defect</span>      <input type="checkbox" bind:checked={activeChar.DEFECT} />      </div>
 </div>
 
-<button class="button" on:click={updateActiveStats} disabled={loading}>{loading ? "Loading..." : "Update"}</button>
+<button class="button" onclick={async () => { await updateActiveStats(); sidebarOpen = false }} disabled={loading}>{loading ? "Loading..." : "Update"}</button>
 
 <div style="flex-grow:1"></div>
 <section id="upload">
@@ -255,7 +257,12 @@
 
 <style>
     #sidebar-open, #sidebar-open-label { display: none; }
-    @media (width <= 800px) {
+    @media (width <= 900px) {
+        #upload {
+            display: none;
+        }
+    }
+    @media (width <= 900px) {
         #sidebar-open-label {
             display: block;
             position: fixed;
@@ -279,10 +286,6 @@
         }
         #sidebar-open:checked + .sidebar {
             display: flex;
-        }
-
-        #upload {
-            display: none;
         }
     }
 </style>

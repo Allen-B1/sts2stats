@@ -10,6 +10,7 @@
 </script>
 
 <div class="root">
+    <div style="height: 42px;flex-shrink:0">&nbsp;</div>
     <div class="tabs">
         {#each tabs as tab, i}
             <button class="tab" class:selected={selected == i} onclick={() => selected = i}>{names[i]}</button>
@@ -27,6 +28,10 @@
         align-items: stretch;
 
         flex-grow: 1;
+        height: 100dvh;
+
+        position: relative;
+        overflow: visible;
     }
 
     .tabs {
@@ -35,6 +40,11 @@
         align-items: center;
         background: #111;
         justify-content: center;
+
+        position: absolute;
+        top: 0;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .tab {
