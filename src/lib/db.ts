@@ -82,6 +82,7 @@ export class Database {
             const lastUpdated = await this.getLastUpdated(d.id);
             if (d.data().updated >= lastUpdated) {
                 rec[d.id] = d.data() as any;
+                delete (rec[d.id] as any).updated;
             }
         }
 
@@ -94,7 +95,10 @@ export class Database {
         if (!d.data() || d.data()!.updated < lastUpdated) {
             return null;
         }
-        return (d.data() as any);
+
+        let data = d.data() as any;
+        delete data.updated;
+        return data;
     }
 
     async setGlobalStats(filter: Filter, stats: Standard.Stats) {

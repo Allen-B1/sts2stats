@@ -96,6 +96,14 @@
         }
     });
     function updateByHash() : boolean {
+        if ((location.hash.slice(1) == ""  || location.hash == "")) {
+            if (activeDataset == "global") {
+                return false;
+            }
+            activeDataset = "global";
+            return true;
+        }
+
         if (selectedPlayer == location.hash.slice(1)) {
             return false;
         }
@@ -142,6 +150,8 @@
     async function updateActiveStats() {
         if (activeDataset == "me") {
             location.hash = "#" + id;
+        } else if (activeDataset == "global") {
+            location.hash = "#";
         }
 
         let filters = [];

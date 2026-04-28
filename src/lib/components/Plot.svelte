@@ -31,10 +31,13 @@
     <div class="plot">
         {#each points as point, i}
             {@const transformed = transform(point)}
+            {@const side =  transformed[1] + POINT_SIZE/2 >= SIZE - 128 ? "top" :
+                            transformed[0] + POINT_SIZE/2 >= SIZE - 128 ? "left" : 
+                            transformed[0] + POINT_SIZE/2 < 128 ? "right" : "bottom"}
             {@const item = getItem(resources[i])}
             <div class="point bg-{item && item.rarity_key}" style="top:{transformed[1]}px;left:{transformed[0]}px;">
                 {#if item}
-                    <div class="popup">
+                    <div class="popup {side}">
                         <h6>{item.name}</h6>
                         <p>Win: {(100*point[1]).toFixed(1)}% | Pick: {(100*point[0]).toFixed(1)}%</p>
                         <p>{@html displayText(item.description || "")}</p>
@@ -69,8 +72,6 @@
             background: hsl(220, 35%, 15%);
             padding: 8px 16px;
             z-index: 10;
-            top: 32px;
-            left: calc(-128px - 8px);
 
             width: 256px;
             text-wrap: wrap;
@@ -78,6 +79,23 @@
             border-radius: 8px;
 
             text-align: center;
+        }
+
+        .bottom {
+            top: 32px;
+            left: calc(-128px - 8px);
+        }
+        .left {
+            right: 32px;
+            top: calc(-128px - 8px);
+        }
+        .right {
+            left: 32px;
+            top: calc(-128px - 8px);
+        }
+        .top {
+            bottom: 32px;
+            left: calc(-128px - 8px);
         }
 
         &:hover .popup { display: block; }
