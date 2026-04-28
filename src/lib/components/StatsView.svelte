@@ -247,7 +247,7 @@
         align-items: center;
 
         column-gap: 32px;
-        row-gap: 16px;
+        row-gap: 32px;
         flex-wrap: wrap;
 
         & > div {
