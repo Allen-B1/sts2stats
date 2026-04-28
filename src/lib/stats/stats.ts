@@ -73,6 +73,14 @@ export namespace Weight {
     export function act(act: number) : Weight {
         return (run, comp) => Number(comp.acts.length > act);
     }
+
+    export function act1(id: `ACT.${string}`) : Weight {
+        return (run, _) => Number(run.acts.includes(id))
+    }
+
+    export function char(char: string) : Weight {
+        return (run, _) => run.players.filter(player => player.character == char).length;
+    }
 }
 
 export type Target = (run: Run, cache: RunCache) => boolean;
@@ -157,7 +165,16 @@ export namespace Standard {
         Schema.from(Weight.one,    Target.win),
         Schema.from(Weight.act(0), Target.lostIn(0)),
         Schema.from(Weight.act(1), Target.lostIn(1)),
-        Schema.from(Weight.act(2), Target.lostIn(2))
+        Schema.from(Weight.act(2), Target.lostIn(2)),
+
+        Schema.from(Weight.act1("ACT.OVERGROWTH"), Target.win),
+        Schema.from(Weight.act1("ACT.UNDERDOCKS"), Target.win),
+
+        Schema.from(Weight.char("CHARACTER.IRONCLAD"),      Target.win),
+        Schema.from(Weight.char("CHARACTER.SILENT"),        Target.win),
+        Schema.from(Weight.char("CHARACTER.REGENT"),        Target.win),
+        Schema.from(Weight.char("CHARACTER.NECROBINDER"),   Target.win),
+        Schema.from(Weight.char("CHARACTER.DEFECT"),        Target.win),
     ];
 
     export enum ResStats {
@@ -166,7 +183,9 @@ export namespace Standard {
     }
 
     export enum GenStats {
-        ALL, ACT1, ACT2, ACT3
+        ALL, ACT1, ACT2, ACT3,
+        OVERGROWTH, UNDERDOCKS,
+        IRONCLAD, SILENT, REGENT, NECROBINDER, DEFECT
     }
 
     export type Stats = Record<ResourceID | "gen", Stat[]>;

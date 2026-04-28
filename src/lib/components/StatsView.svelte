@@ -54,38 +54,49 @@
 
 {#snippet overview()}
 <main>
-
-    <div class="layout-row">
-    <div class="panel stat" style="flex-grow:1">
+    <div class="panel stat" style="grid-row: 1; grid-column: 1 / span 2">
         <h3>Runs</h3>
         <p>{Stat.runs(stats.gen[Standard.GenStats.ALL])}</p>
     </div>
-    <div class="panel stat" style="flex-grow:1">
+    <div class="panel stat" style="grid-row: 1; grid-column: 3 / span 2">
         <h3>Players</h3>
         <p>{players}</p>
     </div>
 
-    <div class="panel stat" style="flex-grow:2">
+    <div class="panel stat" style="grid-row: 1; grid-column: 5 / span 2">
         <h3>Win Rate</h3>
         <p>{@html displayStats(stats.gen[Standard.GenStats.ALL])}</p>
     </div>
 
-    <div class="panel inline" style="align-items:flex-start;flex-grow:0">
-        <h3>Death Rate</h3>
-        <div class="rows wins">
-            <div><strong title="Overall">Act 1</strong>                  <span>{@html displayStats(stats.gen[Standard.GenStats.ACT1])} </span></div>
-            <div><strong title="Survived Act 1">Act 2</strong>           <span>{@html displayStats(stats.gen[Standard.GenStats.ACT2])} </span></div>
-            <div><strong title="Survived Act 2">Act 3</strong>           <span>{@html displayStats(stats.gen[Standard.GenStats.ACT3])} </span></div>
-        </div>
-    </div>
-    </div>
-
-    <div class="layout-row" style="flex-grow:1">
-        <div class="panel">
-            
+    <div class="panel" style="grid-row: 2; grid-column:1 / span 3">
+        <h3>Death Rate by Act</h3>
+        <div class="wins">
+            <strong title="Overall">Act 1</strong>                  <span>{@html displayStats(stats.gen[Standard.GenStats.ACT1])} </span>
+            <strong title="Survived Act 1">Act 2</strong>           <span>{@html displayStats(stats.gen[Standard.GenStats.ACT2])} </span>
+            <strong title="Survived Act 2">Act 3</strong>           <span>{@html displayStats(stats.gen[Standard.GenStats.ACT3])} </span>
         </div>
     </div>
 
+    <div class="panel" style="grid-row: 2 / span 2; grid-column:4 / span 3">
+        <h3>Win Rate by Character</h3>
+        <div style="display:flex;align-items:center; justify-content: center">
+        <div class="vert-wins">
+            {#each [Standard.GenStats.IRONCLAD, Standard.GenStats.SILENT, Standard.GenStats.REGENT, Standard.GenStats.NECROBINDER, Standard.GenStats.DEFECT] as charIdx}
+                {@const name = Standard.GenStats[charIdx]}
+                <strong>{name[0] + name.slice(1).toLowerCase()}</strong>
+                <span>{@html displayStats(stats.gen[charIdx])}</span>
+            {/each}
+        </div>
+        </div>
+    </div>
+
+    <div class="panel" style="grid-row: 3; grid-column:1 / span 3">
+        <h3>Win Rate by Alternate Act</h3>
+        <div class="wins">
+            <strong>Overgrowth</strong> <span>{@html displayStats(stats.gen[Standard.GenStats.OVERGROWTH])}</span>
+            <strong>Underdocks</strong> <span>{@html displayStats(stats.gen[Standard.GenStats.UNDERDOCKS])}</span>
+        </div>
+    </div>
 </main>
 {/snippet}
 
@@ -189,8 +200,10 @@
 
 <style>
     main { 
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-rows: auto 1fr 1fr;
+        grid-template-columns: repeat(6, 1fr);
+
         gap: 16px;
         padding: 32px;
         flex-grow: 1;
@@ -211,10 +224,6 @@
         justify-content: start;
     }
 
-    .wins strong {
-        width: 48px;
-    }
-
     .small-row {
         display: flex;
         flex-direction: row;
@@ -223,4 +232,72 @@
         padding: 0 32px;
         box-sizing: border-box;
     }
+
+    .wins {
+        display: grid;
+        grid-template-rows: auto auto;
+        grid-auto-flow: column;
+        gap: 12px;
+
+        strong { 
+            align-self: end;
+        }
+    }
+    .vert-wins {
+        display: grid;
+        grid-template-columns: auto auto;
+        grid-auto-rows: min-content;
+        grid-auto-flow: row;
+        gap: 12px;
+
+        align-items: center;
+
+        strong {
+            justify-self: end;
+        }
+        span {
+            justify-self: start;
+        }
+    }
+
+    h3 {
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    .panel {
+        display: flex;
+        flex-direction: column;
+        padding: 32px;
+        font-size: 18px;
+        line-height: 1;
+        span {
+            font-size: 32px;
+        }
+        & > :not(h3) {
+            flex-grow: 1;
+        }
+    }
+    .panel:not(.stat) {
+        padding: 64px 0;
+        h3 {
+            margin-bottom: 24px;
+        }
+    } 
+    .panel.stat {
+        display: flex; flex-direction: column;
+        justify-content: center;
+        align-items: stretch;
+        gap: 16px;
+
+        p {
+            flex-grow: 1;
+            font-size: 48px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+
 </style>

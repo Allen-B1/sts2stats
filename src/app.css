@@ -33,19 +33,6 @@
     h3, p {
         margin: 0;
     }
-    &.stat {
-        display: flex; flex-direction: column;
-        justify-content: center;
-        align-items: stretch;
-
-        p {
-            flex-grow: 1;
-            font-size: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    }
 }
 
 .stats {
@@ -88,18 +75,6 @@ h3 {
     & > * {
         flex-grow: 1;
     }
-}
-
-.rows strong {
-    width: 64px;
-    text-wrap: nowrap;
-    display: inline-block;
-    text-align: right;
-    margin-right: 8px;
-}
-.rows strong + span {
-    min-width: 48px;
-    display: inline-block;
 }
 
 .sidebar {
