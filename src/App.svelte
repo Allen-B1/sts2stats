@@ -82,7 +82,7 @@
         id = +Number(localStorage.getItem("id"));
 
         loading = true;
-        hashchange();
+        updateByHash();
         await updateActiveStats();
         loading = false;
     });
@@ -91,11 +91,11 @@
     let activeDataset: "global" | "me" | "player" = $state("global");
     let selectedPlayer: string | null = null;
     window.addEventListener("hashchange", function() {
-        if (hashchange()) {
+        if (updateByHash()) {
             updateActiveStats();
         }
     });
-    function hashchange() : boolean {
+    function updateByHash() : boolean {
         if (selectedPlayer == location.hash.slice(1)) {
             return false;
         }
@@ -104,6 +104,13 @@
             selectedPlayer = location.hash.slice(1);
         } else {
             selectedPlayer = String(id);
+        }
+
+        const nPlayers = selectedPlayer.split("-").length;
+        if (nPlayers != 1 && activeMode == "1" && nPlayers <= 4) {
+            activeMode = nPlayers.toString() as "2" | "3" | "4";
+        } else if (nPlayers == 1 && activeMode != "1" && activeMode != "any") {
+            activeMode = "1";
         }
 
         if (selectedPlayer != String(id)) {
