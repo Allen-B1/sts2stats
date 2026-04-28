@@ -82,20 +82,40 @@
         id = +Number(localStorage.getItem("id"));
 
         loading = true;
+        hashchange();
         await updateActiveStats();
         loading = false;
     });
 
 
-    let activeDataset: "global" | "me" | "player" = "global";
+    let activeDataset: "global" | "me" | "player" = $state("global");
     let selectedPlayer: string | null = null;
     window.addEventListener("hashchange", function() {
+        if (hashchange()) {
+            updateActiveStats();
+        }
+    });
+    function hashchange() : boolean {
+        if (selectedPlayer == location.hash.slice(1)) {
+            return false;
+        }
+
         if (location.hash.slice(1).length) {
             selectedPlayer = location.hash.slice(1);
         } else {
             selectedPlayer = String(id);
         }
-    });
+
+        if (selectedPlayer != String(id)) {
+            activeDataset = "player";
+            return true;
+        } else if (activeDataset != "me") {
+            activeDataset = "me";
+            return true;
+        }
+
+        return false;
+    }
 
     let loading = $state(false);
     let activeChar = $state({
@@ -113,6 +133,10 @@
     let activeStats: Standard.Stats | null = $state(null);
     let activePlayers: number = $state(0);
     async function updateActiveStats() {
+        if (activeDataset == "me") {
+            location.hash = "#" + id;
+        }
+
         let filters = [];
         let chars = [];
         for (let char in activeChar) {
@@ -132,6 +156,7 @@
             filters.push("v-" + activeVersion);
 
         const filter: Filter = filters.sort().join("_");
+        console.log(filter);
         loading = true;
         if (activeDataset == "me" || activeDataset == "player") {
             [activeStats, activePlayers] = await computeLocal(filter, activeDataset == "me" ? String(id) : (selectedPlayer || String(id)));
@@ -148,7 +173,8 @@
             stats = await work({ kind: "standard-compute", runs: runs, filter: filter });
             await db.addStats(players, filter, stats);
         }
-        return [stats, 1];
+        console.log(stats);
+        return [stats, players.split("-").length];
     }
 
     async function computeGlobal(filter: Filter) : Promise<[Standard.Stats, number]> {
@@ -198,8 +224,8 @@
     <select bind:value={activeDataset}>
         <option value="global">Global</option>
         <option value="me">My Runs</option>
-        {#if selectedPlayer}
-        <option value="player">Other</option>
+        {#if activeDataset == "player"}
+        <option value="player">Player {selectedPlayer?.split("-").map(a => a.slice(-3)).join(" and ")}'s Runs</option>
         {/if}
     </select>
 </div>

@@ -358,6 +358,10 @@
         overflow: auto;
         padding: 32px;
         flex-grow: 1;
+
+        display: flex;
+        justify-content: center;
+        align-items: start;
     }
     .background .data-container {
         padding-top: 0;
