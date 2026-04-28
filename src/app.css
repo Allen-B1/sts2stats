@@ -13,9 +13,9 @@
 
 .panel {
     min-height: 0;
-    border-radius: 8px;
+    border-radius: 16px;
     text-align: center;
-    background: hsla(0, 0%, 5%, 65%);
+    background: hsla(0, 0%, 5%, 75%);
     color: #fff;
     padding: 16px 32px;
 

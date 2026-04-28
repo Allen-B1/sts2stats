@@ -184,6 +184,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Kreon:wght@300..700&family=Saira:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </svelte:head>
 
+<label for="sidebar-open" id="sidebar-open-label">≡</label>
+<input type="checkbox" id="sidebar-open">
+
 <div class="sidebar">
 <h3>Filters</h3>
 <div class="field">
@@ -232,10 +235,13 @@
 <button class="button" on:click={updateActiveStats} disabled={loading}>{loading ? "Loading..." : "Update"}</button>
 
 <div style="flex-grow:1"></div>
+<section id="upload">
 <h3>Upload Runs</h3>
 <p>Select the folder inside of<br />'SlayTheSpire2/steam'</p>
 <input style="margin-top:8px" type="file" bind:files={files} webkitdirectory accept=".run">
+</section>
 </div>
+
 
 {#if activeStats}
 <StatsC stats={activeStats} players={activePlayers} />
@@ -244,3 +250,37 @@
 {#if $errors.msg != ""}
     <div class="error">{$errors.msg} <span class="time">{Errors.countdown($errors)}</span></div>
 {/if}
+
+<style>
+    #sidebar-open, #sidebar-open-label { display: none; }
+    @media (width <= 800px) {
+        #sidebar-open-label {
+            display: block;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 42px; height: 42px;
+            text-align: center;
+            line-height: 42px;
+            cursor: pointer;
+            font-size: 24px;
+            font-family: sans-serif;
+            z-index: 30;
+        }
+        .sidebar {
+            display: none;
+
+            position: fixed;
+            z-index: 20;
+            width: 100%; height: 100%;
+            box-sizing: border-box;
+        }
+        #sidebar-open:checked + .sidebar {
+            display: flex;
+        }
+
+        #upload {
+            display: none;
+        }
+    }
+</style>

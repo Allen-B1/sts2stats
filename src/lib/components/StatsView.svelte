@@ -54,21 +54,21 @@
 
 {#snippet overview()}
 <main>
-    <div class="panel stat" style="grid-row: 1; grid-column: 1 / span 2">
-        <h3>Runs</h3>
+    <div class="panel stat" id="panel-runs">
+        <h4>Runs</h4>
         <p>{Stat.runs(stats.gen[Standard.GenStats.ALL])}</p>
     </div>
-    <div class="panel stat" style="grid-row: 1; grid-column: 3 / span 2">
-        <h3>Players</h3>
+    <div class="panel stat" id="panel-players">
+        <h4>Players</h4>
         <p>{players}</p>
     </div>
 
-    <div class="panel stat" style="grid-row: 1; grid-column: 5 / span 2">
-        <h3>Win Rate</h3>
+    <div class="panel stat" id="panel-winrate">
+        <h4>Win Rate</h4>
         <p>{@html displayStats(stats.gen[Standard.GenStats.ALL])}</p>
     </div>
 
-    <div class="panel" style="grid-row: 2; grid-column:1 / span 3">
+    <div class="panel" id="panel-dr-act">
         <h3>Death Rate by Act</h3>
         <div class="wins">
             <strong title="Overall">Act 1</strong>                  <span>{@html displayStats(stats.gen[Standard.GenStats.ACT1])} </span>
@@ -77,20 +77,20 @@
         </div>
     </div>
 
-    <div class="panel" style="grid-row: 2 / span 2; grid-column:4 / span 3">
+    <div class="panel" id="panel-wr-char">
         <h3>Win Rate by Character</h3>
-        <div style="display:flex;align-items:center; justify-content: center">
-        <div class="vert-wins">
+        <div class="wins-flex">
             {#each [Standard.GenStats.IRONCLAD, Standard.GenStats.SILENT, Standard.GenStats.REGENT, Standard.GenStats.NECROBINDER, Standard.GenStats.DEFECT] as charIdx}
-                {@const name = Standard.GenStats[charIdx]}
+            {@const name = Standard.GenStats[charIdx]}
+            <div>
                 <strong>{name[0] + name.slice(1).toLowerCase()}</strong>
                 <span>{@html displayStats(stats.gen[charIdx])}</span>
+            </div>
             {/each}
-        </div>
         </div>
     </div>
 
-    <div class="panel" style="grid-row: 3; grid-column:1 / span 3">
+    <div class="panel" id="panel-wr-act">
         <h3>Win Rate by Alternate Act</h3>
         <div class="wins">
             <strong>Overgrowth</strong> <span>{@html displayStats(stats.gen[Standard.GenStats.OVERGROWTH])}</span>
@@ -201,12 +201,12 @@
 <style>
     main { 
         display: grid;
-        grid-template-rows: auto 1fr 1fr;
+        grid-template-rows: auto auto auto;
         grid-template-columns: repeat(6, 1fr);
 
         gap: 16px;
         padding: 32px;
-        flex-grow: 1;
+        flex-grow: 0;
 
         box-sizing: border-box;
     }
@@ -243,25 +243,31 @@
             align-self: end;
         }
     }
-    .vert-wins {
-        display: grid;
-        grid-template-columns: auto auto;
-        grid-auto-rows: min-content;
-        grid-auto-flow: row;
-        gap: 12px;
 
+    .wins-flex {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
         align-items: center;
+        column-gap: 32px;
+        row-gap: 16px;
+        flex-wrap: wrap;
 
-        strong {
-            justify-self: end;
-        }
-        span {
-            justify-self: start;
+        & > div {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 27%;
         }
     }
 
-    h3 {
+    h4, strong {
         font-size: 24px;
+        margin: 0;
+    }
+    h3 {
+        font-size: 18px;
+        color: hsl(25, 50%, 75%);
         line-height: 1;
     }
 
@@ -272,16 +278,16 @@
         font-size: 18px;
         line-height: 1;
         span {
-            font-size: 32px;
+            font-size: 40px;
         }
         & > :not(h3) {
             flex-grow: 1;
         }
     }
     .panel:not(.stat) {
-        padding: 64px 0;
         h3 {
             margin-bottom: 24px;
+            text-align: start;
         }
     } 
     .panel.stat {
@@ -300,4 +306,17 @@
         }
     }
 
+
+    #panel-runs { grid-row: 1; grid-column: 1 / span 2; }
+    #panel-players { grid-row: 1; grid-column: 3 / span 2; }
+    #panel-winrate { grid-row: 1; grid-column: 5 / span 2; }
+    #panel-dr-act { grid-row: 2; grid-column: 1 / span 3; }
+    #panel-wr-act { grid-row: 3; grid-column: 1 / span 3; }
+    #panel-wr-char { grid-row: 2 / span 2; grid-column: 4 / span 3; }
+
+    @media (width <= 1200px) {
+        #panel-dr-act { grid-row: 2; grid-column: 1 / span 6; }
+        #panel-wr-act { grid-row: 3; grid-column: 1 / span 6; }
+        #panel-wr-char { grid-row: 4; grid-column: 1 / span 6; }
+    }
 </style>
