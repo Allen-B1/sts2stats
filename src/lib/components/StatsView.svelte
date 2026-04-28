@@ -53,7 +53,7 @@
 <Tabs tabs={[overview, cardSnippet, relicSnippet, ancientSnippet]} names={["Overview", "Cards", "Relics", "Ancients"]} />
 
 {#snippet overview()}
-<div class="data-container">
+<div class="data-container"><div>
 <main>
     <div class="panel stat" id="panel-runs">
         <h4>Runs</h4>
@@ -99,7 +99,7 @@
         </div>
     </div>
 </main>
-</div>
+</div></div>
 {/snippet}
 
 {#snippet ancientSnippet()}
@@ -121,7 +121,7 @@
 </select>
 </div>
 
-<div class="data-container">
+<div class="data-container"><div>
 {#if disp == "scatter"}
 <Plot points={filteredAncients.map(card => [
     Stat.ratio(stats[card][Standard.ResStats.PICK]), 
@@ -139,13 +139,13 @@
     [Standard.ResStats.PICK_ACT3, "Pick% Act 3"],
 ]} />
 {/if}
-</div>
+</div></div>
 
 </div>    
 {/snippet}
 
 {#snippet relicSnippet()}
-<div class="data-container">
+<div class="data-container"><div>
 <Table title="Relic" resources={relics} stats={stats} display={[
     [Standard.ResStats.ANY, "Win%"],
     [Standard.ResStats.EASY, "Win% Easy"],
@@ -153,7 +153,7 @@
     [Standard.ResStats.ACT2, "Win% Act 2"],
     [Standard.ResStats.ACT3, "Win% Act 3"],
 ]} />
-</div>
+</div></div>
 
 {/snippet}
 
@@ -182,7 +182,7 @@
 </select>
 </div>
 
-<div class="data-container">
+<div class="data-container"><div>
 {#if disp == "scatter"}
 <Plot points={filteredCards.map(card => [
     Stat.ratio(stats[card][Standard.ResStats.PICK]), 
@@ -201,7 +201,7 @@
     [Standard.ResStats.PICK_ACT3, "Pick% Act 3"],
 ]} />
 {/if}
-</div>
+</div></div>
 
 </div>
 {/snippet}
@@ -353,18 +353,24 @@
 
     .data-container {
         box-sizing: border-box;
-        max-width: 100dvw;
-        max-height: calc(100dvh - 45px);
-        overflow: auto;
-        padding: 32px;
+        width: var(--main-width);
+        height: calc(100dvh - 45px);
         flex-grow: 1;
 
         display: flex;
         justify-content: center;
         align-items: start;
     }
-    .background .data-container {
+    .data-container > div {
+        box-sizing: border-box;
+        padding: 32px;
+        max-width: var(--main-width);
+        height: calc(100dvh - 45px);
+
+        overflow: auto;
+    }
+    .background .data-container, .background .data-container > div {
         padding-top: 0;
-        max-height: calc(100dvh - 45px - 28px - 32px);
+        height: calc(100dvh - 45px - 28px - 32px);
     }
 </style>

@@ -299,13 +299,35 @@
 {/if}
 
 <style>
+
+    .sidebar {
+        box-sizing: border-box;
+        width: 320px;
+        flex-shrink: 0;
+        padding: 16px;
+        background: hsl(220, 35%, 15%);
+        display: flex; flex-direction: column;
+        gap: 6px;
+
+        h3, p {
+            text-align: center;
+            margin: 0;
+        }
+    }
+
     #sidebar-open, #sidebar-open-label { display: none; }
+    :root {
+        --main-width: calc(100dvw - 320px);
+    }
     @media (width <= 900px) {
         #upload {
             display: none;
         }
     }
     @media (width <= 900px) {
+        :root {
+            --main-width: 100dvw;
+        }
         #sidebar-open-label {
             display: block;
             position: fixed;
