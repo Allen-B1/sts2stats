@@ -8,10 +8,7 @@
         resources: ResourceID[]
     } = $props();
 
-    let maxX = $derived(Math.max(...points.map(p => p[0])));
-    let maxY = $derived(Math.max(...points.map(p => p[1])));
-    let minX = $derived(Math.min(...points.map(p => p[0])));
-    let minY = $derived(Math.min(...points.map(p => p[1])));
+    let maxX = 1, maxY = 1, minX = 0, minY = 0;
 
     const SIZE = 768;
     const POINT_SIZE = 16, PADDING = 16;
