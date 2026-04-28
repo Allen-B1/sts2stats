@@ -14,10 +14,12 @@
     let minY = $derived(Math.min(...points.map(p => p[1])));
 
     const SIZE = 768;
+    const POINT_SIZE = 16, PADDING = 16;
+    const INNER_SIZE = (SIZE - POINT_SIZE - PADDING * 2);
     function transform(point: [number, number]) : [number, number] {
         let x = point[0], y = point[1];
 
-        return [(x - minX) / (maxX - minX) * SIZE, SIZE-(y - minY) / (maxY - minY) * SIZE];
+        return [(x - minX) / (maxX - minX) * INNER_SIZE + PADDING, INNER_SIZE-(y - minY) / (maxY - minY) * INNER_SIZE + PADDING];
     }
 
     function getItem(id: ResourceID) : Card | Relic | null {
