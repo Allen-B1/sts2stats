@@ -278,13 +278,14 @@
         font-size: 18px;
         line-height: 1;
         span {
-            font-size: 40px;
+            font-size: 48px;
         }
         & > :not(h3) {
             flex-grow: 1;
         }
     }
     .panel:not(.stat) {
+        gap: 8px;
         h3 {
             margin-bottom: 24px;
             text-align: start;
@@ -294,7 +295,7 @@
         display: flex; flex-direction: column;
         justify-content: center;
         align-items: stretch;
-        gap: 16px;
+        gap: 12px;
 
         p {
             flex-grow: 1;
