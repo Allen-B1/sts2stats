@@ -39,7 +39,6 @@
 
             loading = true;
             id = Number(files[0].webkitRelativePath.split("/")[0]);
-            console.log(files[0].webkitRelativePath, "new id: " + id);
             if (!Number.isInteger(id) || id < 10) {
                 Errors.show(errors, "Invalid folder. Select the folder whose name is a large integer.");
                 return;
@@ -164,7 +163,6 @@
             filters.push("v-" + activeVersion);
 
         const filter: Filter = filters.sort().join("_");
-        console.log(filter);
         loading = true;
         if (activeDataset == "me" || activeDataset == "player") {
             [activeStats, activePlayers] = await computeLocal(filter, activeDataset == "me" ? String(id) : (selectedPlayer || String(id)));
@@ -178,7 +176,6 @@
         let stats = await db.getStatsLocal(filter, players);
         if (stats == null) {
             const runs = await db.getRuns(players);
-            console.log(runs[0]);
             stats = await work({ kind: "standard-compute", runs: runs, filter: filter });
             await db.addStats(players, filter, stats);
         }
