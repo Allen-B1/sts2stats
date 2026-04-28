@@ -51,8 +51,6 @@
 
 <style>
 table {
-    flex-grow: 1;
-
     background: var(--panel-bg);
     border-radius: 16px;
     padding: 16px;
