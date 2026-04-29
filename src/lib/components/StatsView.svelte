@@ -46,6 +46,11 @@
         .filter(res => disp == "scatter" ? Stat.runs(stats[res][Standard.ResStats.PICK]) > 1 : true)
     );
 
+    let activeRarity: string = $state("any");
+    const filteredRelics = $derived(relics
+        .filter(res => activeRarity == "any" || RELICS[res.slice(6)] && RELICS[res.slice(6)].rarity_key.toLowerCase() == activeRarity)
+    );
+
     let disp: "table" | "scatter" = $state("scatter");
 </script>
 
@@ -154,18 +159,27 @@
     <input type="radio" value={"table"} id="relicdisp-radio-table" name="relicdisp" bind:group={disp}>
     <label for="relicdisp-radio-table">Table</label>
 </div>
+
+<div class="sep"></div>
+
+<select bind:value={activeRarity}>
+    <option value="any">Any</option>
+    <option value="common">Common</option>
+    <option value="uncommon">Uncommon</option>
+    <option value="rare">Rare</option>
+    <option value="event">Event</option>
+</select>
 </div>
 
 <div class="data-container"><div>
 {#if disp == "scatter"}
-{@const filteredRelics = relics.filter(relic => RELICS[relic.slice("RELIC.".length)])}
-{@const filteredRelicData = filteredRelics.map(relic => RELICS[relic.slice("RELIC.".length)])}
-<Plot updater={stats} resources={filteredRelics} points={filteredRelics.map((relic, i) => [
+{@const filteredRelics_ = filteredRelics.filter(relic => RELICS[relic.slice("RELIC.".length)])}
+<Plot updater={stats} resources={filteredRelics_} points={filteredRelics_.map((relic, i) => [
     Stat.runs(stats[relic][Standard.ResStats.ANY]) / Stat.runs(stats.gen[Standard.GenStats.ALL]),
     Stat.ratio(stats[relic][Standard.ResStats.ANY])
 ])} scalex={true} />
 {:else}
-<Table title="Relic" resources={relics} stats={stats} display={[
+<Table title="Relic" resources={filteredRelics} stats={stats} display={[
     [Standard.ResStats.ANY, "Win%"],
     [Standard.ResStats.EASY, "Win% Easy"],
     [Standard.ResStats.ACT1, "Win% Act 1"],

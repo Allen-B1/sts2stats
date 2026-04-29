@@ -12,24 +12,12 @@
         scalex?: boolean
     } = $props();
 
-    let minY = 0, maxY = 1;
-    let minX = 0; 
-    let maxX = 1;     
-
-    $effect(() => {
-        updater;
-        updateBounds();
-    });
-
-    function updateBounds() {
-        minX = !scalex ? 0 : Math.min(...points.map(p => p[0]));
-        maxX = !scalex ? 1 : Math.max(...points.map(p => p[0])); 
-    }
-
-    updateBounds();
+    const minY = 0, maxY = 1;
+    const minX = $derived(!scalex ? 0 : Math.min(...points.map(p => p[0]))); 
+    const maxX = $derived(!scalex ? 1 : Math.max(...points.map(p => p[0])));
 
     const SIZE = 768;
-    const POINT_SIZE = 16, PADDING = 16;
+    const POINT_SIZE = 16, PADDING = 32;
     const INNER_SIZE = (SIZE - POINT_SIZE - PADDING * 2);
     function transform(point: [number, number], ...args: any[]) : [number, number] {
         let x = point[0], y = point[1];
