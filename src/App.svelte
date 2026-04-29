@@ -285,7 +285,7 @@
 <section id="upload">
 <h3>Upload Runs</h3>
 <p>Select the folder inside of<br />'SlayTheSpire2/steam'</p>
-<input style="margin-top:8px" type="file" bind:files={files} webkitdirectory accept=".run">
+<input style="margin-top:8px" type="file" disabled={loading} bind:files={files} webkitdirectory accept=".run">
 </section>
 </div>
 

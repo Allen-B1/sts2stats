@@ -123,6 +123,11 @@ label {
     }
 }
 
+:disabled::file-selector-button {
+    background: hsl(220, 5%, 35%);
+    cursor: default;
+}
+
 select:focus:hover {
     background: hsl(220, 35%, 20%);
 }
