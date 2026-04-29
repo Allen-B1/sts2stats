@@ -53,7 +53,7 @@
 <Tabs tabs={[overview, cardSnippet, relicSnippet, ancientSnippet]} names={["Overview", "Cards", "Relics", "Ancients"]} />
 
 {#snippet overview()}
-<div class="data-container"><div>
+<div class="data-container"><div style="flex-grow:1">
 <main>
     <div class="panel stat" id="panel-runs">
         <h4>Runs</h4>
