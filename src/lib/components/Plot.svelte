@@ -28,8 +28,8 @@
     <div class="plot">
         {#each points as point, i}
             {@const transformed = transform(point)}
-            {@const side =  transformed[0] + POINT_SIZE/2 >= SIZE - 128 ? "left" : 
-                            transformed[0] + POINT_SIZE/2 <= 128        ? "right" : 
+            {@const side =  transformed[0] + POINT_SIZE/2 >= SIZE - 256 ? "left" : 
+                            transformed[0] + POINT_SIZE/2 <= 256        ? "right" : 
                             transformed[1] + POINT_SIZE/2 >= SIZE - 128 ? "top" :
                             transformed[1] + POINT_SIZE/2 <= 128        ? "bottom" :"right"}
             {@const item = getItem(resources[i])}
