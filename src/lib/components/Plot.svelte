@@ -58,7 +58,7 @@
                 {/if}
                     <div class="popup {side}">
                         <h6>{item && item.name || resources[i]}</h6>
-                        <p>Win: {(100*point[1]).toFixed(1)}% | {scalex ? "Pick" : "Seen"}: {(100*point[0]).toFixed(1)}%</p>
+                        <p>Win: {(100*point[1]).toFixed(1)}% | {!scalex ? "Pick" : "Seen"}: {(100*point[0]).toFixed(1)}%</p>
                         {#if item}<p>{@html displayText(item.description || "")}</p>{/if}
                     </div>
             </div>
