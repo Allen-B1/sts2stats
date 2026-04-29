@@ -1,19 +1,37 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { CARDS, RELICS, type Card, type Relic } from "../data/defs";
     import type { ResourceID } from "../stats/run";
     import { displayText } from "../utils";
+    import type { Standard } from "../stats/stats";
 
-    let { points, resources } : {
+    let { updater, points, resources, scalex = false } : {
+        updater: Standard.Stats,
         points: [number, number][],
-        resources: ResourceID[]
+        resources: ResourceID[],
+        scalex?: boolean
     } = $props();
 
-    let maxX = 1, maxY = 1, minX = 0, minY = 0;
+    let minY = 0, maxY = 1;
+    let minX = 0; 
+    let maxX = 1;     
+
+    $effect(() => {
+        updater;
+        updateBounds();
+    });
+
+    function updateBounds() {
+        minX = !scalex ? 0 : Math.min(...points.map(p => p[0]));
+        maxX = !scalex ? 1 : Math.max(...points.map(p => p[0])); 
+    }
+
+    updateBounds();
 
     const SIZE = 768;
     const POINT_SIZE = 16, PADDING = 16;
     const INNER_SIZE = (SIZE - POINT_SIZE - PADDING * 2);
-    function transform(point: [number, number]) : [number, number] {
+    function transform(point: [number, number], ...args: any[]) : [number, number] {
         let x = point[0], y = point[1];
 
         return [(x - minX) / (maxX - minX) * INNER_SIZE + PADDING, INNER_SIZE-(y - minY) / (maxY - minY) * INNER_SIZE + PADDING];
@@ -33,14 +51,16 @@
                             transformed[1] + POINT_SIZE/2 >= SIZE - 128 ? "top" :
                             transformed[1] + POINT_SIZE/2 <= 128        ? "bottom" :"right"}
             {@const item = getItem(resources[i])}
-            <div class="point bg-{item && item.rarity_key}" style="top:{transformed[1]}px;left:{transformed[0]}px;">
-                {#if item}
-                    <div class="popup {side}">
-                        <h6>{item.name}</h6>
-                        <p>Win: {(100*point[1]).toFixed(1)}% | Pick: {(100*point[0]).toFixed(1)}%</p>
-                        <p>{@html displayText(item.description || "")}</p>
-                    </div>
+            {@const icon = resources[i].startsWith("RELIC.") ? "https://spire-codex.com/static/images/relics/" + resources[i].slice("RELIC.".length).toLowerCase() + ".webp" : null}
+            <div class="point {icon ? "image" : `bg-${item && item.rarity_key}`}" style="top:{transformed[1]}px;left:{transformed[0]}px;">
+                {#if icon}
+                    <img src={icon} alt={item && item.name || resources[i]} />
                 {/if}
+                    <div class="popup {side}">
+                        <h6>{item && item.name || resources[i]}</h6>
+                        <p>Win: {(100*point[1]).toFixed(1)}% | {scalex ? "Pick" : "Seen"}: {(100*point[0]).toFixed(1)}%</p>
+                        {#if item}<p>{@html displayText(item.description || "")}</p>{/if}
+                    </div>
             </div>
         {/each}
     </div>
@@ -62,6 +82,17 @@
         height: 16px;
         border-radius: 16px;
         background: white;
+
+        &.image {
+            background: none;
+        }
+        img {
+            position: absolute;
+            top: -16px; /* (img size - point size) / 2 */
+            left: -16px;
+            width: 48px;
+            height: 48px;
+        }
 
         .popup {
             position: absolute;

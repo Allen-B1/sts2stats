@@ -21,7 +21,7 @@ export interface Card {
 export interface Relic {
     id: string,
     name: string,
-    rarity_key: "Common" | "Uncommon" | "Ancient" | "Rare",
+    rarity_key: "Common" | "Uncommon" | "Ancient" | "Rare" | "Event",
     description: string,
 }
 

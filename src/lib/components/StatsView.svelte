@@ -123,7 +123,7 @@
 
 <div class="data-container"><div>
 {#if disp == "scatter"}
-<Plot points={filteredAncients.map(card => [
+<Plot updater={stats} points={filteredAncients.map(card => [
     Stat.ratio(stats[card][Standard.ResStats.PICK]), 
     Stat.ratio(stats[card][Standard.ResStats.ANY])
 ])} resources={filteredAncients} />
@@ -145,7 +145,26 @@
 {/snippet}
 
 {#snippet relicSnippet()}
+<div class="background">
+<div class="small-row">
+<div class="radiobutton">
+    <input type="radio" value={"scatter"} id="relicdisp-radio-scatter" name="relicdisp" bind:group={disp}>
+    <label for="relicdisp-radio-scatter">Plot</label>
+
+    <input type="radio" value={"table"} id="relicdisp-radio-table" name="relicdisp" bind:group={disp}>
+    <label for="relicdisp-radio-table">Table</label>
+</div>
+</div>
+
 <div class="data-container"><div>
+{#if disp == "scatter"}
+{@const filteredRelics = relics.filter(relic => RELICS[relic.slice("RELIC.".length)])}
+{@const filteredRelicData = filteredRelics.map(relic => RELICS[relic.slice("RELIC.".length)])}
+<Plot updater={stats} resources={filteredRelics} points={filteredRelics.map((relic, i) => [
+    Stat.runs(stats[relic][Standard.ResStats.ANY]) / Stat.runs(stats.gen[Standard.GenStats.ALL]),
+    Stat.ratio(stats[relic][Standard.ResStats.ANY])
+])} scalex={true} />
+{:else}
 <Table title="Relic" resources={relics} stats={stats} display={[
     [Standard.ResStats.ANY, "Win%"],
     [Standard.ResStats.EASY, "Win% Easy"],
@@ -153,7 +172,10 @@
     [Standard.ResStats.ACT2, "Win% Act 2"],
     [Standard.ResStats.ACT3, "Win% Act 3"],
 ]} />
+{/if}
 </div></div>
+</div>
+
 
 {/snippet}
 
@@ -184,7 +206,7 @@
 
 <div class="data-container"><div>
 {#if disp == "scatter"}
-<Plot points={filteredCards.map(card => [
+<Plot updater={stats} points={filteredCards.map(card => [
     Stat.ratio(stats[card][Standard.ResStats.PICK]), 
     Stat.ratio(stats[card][Standard.ResStats.ANY])
 ])} resources={filteredCards} />
