@@ -5,21 +5,24 @@
     import { displayText } from "../utils";
     import type { Standard } from "../stats/stats";
 
-    let { updater, points, resources } : {
+    let { updater, points, resources, relics = false } : {
         updater: Standard.Stats,
         points: [number, number][],
-        resources: ResourceID[]
+        resources: ResourceID[],
+        relics?: boolean
     } = $props();
 
     const minY = 0, maxY = 1;
     const minX = $derived(0);
-    const maxX = $derived(1);
+    const maxX = $derived(relics ? 0.33 : 1);
 
     const SIZE = 768;
     const POINT_SIZE = 16, PADDING = 32;
     const INNER_SIZE = (SIZE - POINT_SIZE - PADDING * 2);
     function transform(point: [number, number], ...args: any[]) : [number, number] {
         let x = point[0], y = point[1];
+
+        if (x >= maxX) x = maxX;
 
         return [(x - minX) / (maxX - minX) * INNER_SIZE + PADDING, INNER_SIZE-(y - minY) / (maxY - minY) * INNER_SIZE + PADDING];
     }
@@ -45,7 +48,7 @@
                 {/if}
                     <div class="popup {side}">
                         <h6>{item && item.name || resources[i]}</h6>
-                        <p>Win: {(100*point[1]).toFixed(1)}% | {resources[i].startsWith("RELIC.") ? "Bought" : "Pick"}: {(100*point[0]).toFixed(1)}%</p>
+                        <p>Win: {(100*point[1]).toFixed(1)}% | {relics ? "Bought" : "Pick"}: {(100*point[0]).toFixed(1)}%</p>
                         {#if item}<p>{@html displayText(item.description || "")}</p>{/if}
                     </div>
             </div>

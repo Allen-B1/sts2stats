@@ -191,11 +191,13 @@
 
 <div class="data-container"><div>
 {#if disp == "scatter"}
-{@const filteredRelics_ = filteredRelics.filter(relic => RELICS[relic.slice("RELIC.".length)])}
-<Plot updater={stats} resources={filteredRelics_} points={filteredRelics_.map((relic, i) => [
-    Stat.runs(stats[relic][Standard.ResStats.ANY]) / Stat.runs(stats.gen[Standard.GenStats.ALL]),
+{@const filteredRelics_ = filteredRelics
+        .filter(relic => RELICS[relic.slice("RELIC.".length)])
+        .filter(relic => Stat.runs(stats[relic][Standard.ResStats.PICK]) > 1)}
+<Plot updater={stats} resources={filteredRelics_} points={filteredRelics_.map((relic) => [
+    Stat.ratio(stats[relic][Standard.ResStats.PICK]),
     Stat.ratio(stats[relic][Standard.ResStats.ANY])
-])} />
+])} relics={true} />
 {:else}
 <Table title="Relic" resources={filteredRelics} stats={stats} display={[
     [Standard.ResStats.ANY, "Win%"],
@@ -203,6 +205,10 @@
     [Standard.ResStats.ACT1, "Win% Act 1"],
     [Standard.ResStats.ACT2, "Win% Act 2"],
     [Standard.ResStats.ACT3, "Win% Act 3"],
+    [Standard.ResStats.PICK, "Buy%"],
+    [Standard.ResStats.PICK_ACT1, "Buy% Act 1"],
+    [Standard.ResStats.PICK_ACT2, "Buy% Act 2"],
+    [Standard.ResStats.PICK_ACT3, "Buy% Act 3"],
 ]} />
 {/if}
 </div></div>
