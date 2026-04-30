@@ -94,19 +94,19 @@ export function importRun(data: any, id: number) : Run  {
             const playerRewards = rewards[`rewards-${i}`];
 
             if (playerStats.card_choices && floor.map_point_type != "shop") {
-                playerRewards.push(...playerStats.card_choices.map((choice: any) => ({
+                playerRewards.push(...(playerStats.card_choices as any[]).map((choice) => ({
                     floor: floorNum,
                     resource: choice.card.id,
                     picked: choice.was_picked
-                })));
+                } as Reward)));
             }
 
             if (playerStats.ancient_choice) {
-                playerRewards.push(...playerStats.ancient_choice.map((choice: any) => ({
+                playerRewards.push(...(playerStats.ancient_choice as any[]).map((choice: any) => ({
                     resource: `RELIC.${choice.TextKey}`,
                     floor: floorNum,
                     picked: choice.was_chosen
-                })));
+                } as Reward)));
             }
 
             if (floor.rooms && floor.rooms[0] && floor.rooms[0].room_type == "shop" && playerStats.relic_choices) {
