@@ -14,7 +14,7 @@
 
     const minY = 0, maxY = 1;
     const minX = $derived(0);
-    const maxX = $derived(relics ? 0.33 : 1);
+    const maxX = $derived(relics ? 1 : 1);
 
     const SIZE = 768;
     const POINT_SIZE = 16, PADDING = 32;
