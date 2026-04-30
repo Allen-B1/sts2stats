@@ -130,6 +130,10 @@ export namespace Schema {
             }
         }
     }
+
+    export const duration : Schema = (run: Run, _) => {
+        return [1, run.duration];
+    };
 }
 export function computeStatOne(run: Run, cache: RunCache, schema: Schema) : Stat {
     const [w, t] = schema(run, cache);
@@ -161,11 +165,17 @@ export namespace Standard {
         Schema.pickAct(res, 2)
     ];
 
+    export enum ResStats {
+        ANY, ACT1, ACT2, ACT3, EASY,
+        PICK, PICK_ACT1, PICK_ACT2, PICK_ACT3
+    }
+
     export const GEN_STATS : Schema[] = [
         Schema.from(Weight.one,    Target.win),
         Schema.from(Weight.act(0), Target.lostIn(0)),
         Schema.from(Weight.act(1), Target.lostIn(1)),
         Schema.from(Weight.act(2), Target.lostIn(2)),
+        Schema.duration,
 
         Schema.from(Weight.act1("ACT.OVERGROWTH"), Target.win),
         Schema.from(Weight.act1("ACT.UNDERDOCKS"), Target.win),
@@ -177,13 +187,9 @@ export namespace Standard {
         Schema.from(Weight.char("CHARACTER.DEFECT"),        Target.win),
     ];
 
-    export enum ResStats {
-        ANY, ACT1, ACT2, ACT3, EASY,
-        PICK, PICK_ACT1, PICK_ACT2, PICK_ACT3
-    }
-
     export enum GenStats {
         ALL, ACT1, ACT2, ACT3,
+        DURATION,
         OVERGROWTH, UNDERDOCKS,
         IRONCLAD, SILENT, REGENT, NECROBINDER, DEFECT
     }

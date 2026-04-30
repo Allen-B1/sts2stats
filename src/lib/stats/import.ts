@@ -1,4 +1,4 @@
-import { FloorType, type Resource, type Reward, type Run } from "./run";
+import { FloorType, type Resource, type ResourceID, type Reward, type Run } from "./run";
 
 
 export function importRun(data: any, id: number) : Run  {
@@ -113,6 +113,14 @@ export function importRun(data: any, id: number) : Run  {
                 })));
             }
 
+            if (floor.rooms && floor.rooms[0] && floor.rooms[0].room_type == "shop" && playerStats.relic_choices) {
+                playerRewards.push(...playerStats.relic_choices.map((choice: any) => ({
+                    reosurce: choice.choice as ResourceID,
+                    floor: floorNum,
+                    picked: choice.was_picked
+                })));
+            }
+
             if (floor.rooms && floor.rooms[0] && floor.rooms[0].model_id == "EVENT.WOOD_CARVINGS") {
                 playerRewards.push({
                     resource: "CARD.TORIC_TOUGHNESS",
@@ -132,6 +140,8 @@ export function importRun(data: any, id: number) : Run  {
     return {
         version: data.build_id as string,
         start: data.start_time as number,
+        duration: data.run_time as number,
+        
         asc: data.ascension as number,
         players: data.players.map((player: any) => ({
             character: player.character as string,

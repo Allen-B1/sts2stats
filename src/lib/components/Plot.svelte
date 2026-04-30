@@ -5,16 +5,15 @@
     import { displayText } from "../utils";
     import type { Standard } from "../stats/stats";
 
-    let { updater, points, resources, scalex = false } : {
+    let { updater, points, resources } : {
         updater: Standard.Stats,
         points: [number, number][],
-        resources: ResourceID[],
-        scalex?: boolean
+        resources: ResourceID[]
     } = $props();
 
     const minY = 0, maxY = 1;
-    const minX = $derived(!scalex ? 0 : Math.min(...points.map(p => p[0]))); 
-    const maxX = $derived(!scalex ? 1 : Math.max(...points.map(p => p[0])));
+    const minX = $derived(0);
+    const maxX = $derived(1);
 
     const SIZE = 768;
     const POINT_SIZE = 16, PADDING = 32;
@@ -46,7 +45,7 @@
                 {/if}
                     <div class="popup {side}">
                         <h6>{item && item.name || resources[i]}</h6>
-                        <p>Win: {(100*point[1]).toFixed(1)}% | {!scalex ? "Pick" : "Seen"}: {(100*point[0]).toFixed(1)}%</p>
+                        <p>Win: {(100*point[1]).toFixed(1)}% | {resources[i].startsWith("RELIC.") ? "Bought" : "Pick"}: {(100*point[0]).toFixed(1)}%</p>
                         {#if item}<p>{@html displayText(item.description || "")}</p>{/if}
                     </div>
             </div>

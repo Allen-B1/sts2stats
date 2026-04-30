@@ -216,6 +216,7 @@
 
         globalStats = await work({ kind: "standard-combine", statss: Object.values(stats) });
         await db.setGlobalStats(filter, globalStats);
+
         return [globalStats, playerss.filter(p => p.indexOf("-") == -1).length];
     }
 

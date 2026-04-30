@@ -52,6 +52,16 @@
     );
 
     let disp: "table" | "scatter" = $state("scatter");
+
+    function formatTime(stat: Stat) : string {
+        const secs = Stat.target(stat) / Stat.total(stat);
+        let sec = Math.floor(secs % 60);
+        let min = Math.floor(secs / 60);
+        let hr = Math.floor(min / 60);
+        min = min % 60;
+
+        return `<span title="${Stat.runs(stat)} runs">` + (hr != 0 ? `${hr}:${min.toString().padStart(2, "0")}` : min) + ":" + sec.toString().padStart(2, "0") + "</span>";
+    }
 </script>
 
 
@@ -73,6 +83,14 @@
         <h4>Win Rate</h4>
         <p>{@html displayStats(stats.gen[Standard.GenStats.ALL])}</p>
     </div>
+
+    {#if true}
+    {@const stat = stats.gen[Standard.GenStats.DURATION]}
+    <div class="panel stat" id="panel-duration">
+        <h4>Average Run Time</h4>
+        <p>{@html formatTime(stat)}</p>
+    </div>
+    {/if}
 
     <div class="panel" id="panel-dr-act">
         <h3>Death Rate by Act</h3>
@@ -177,7 +195,7 @@
 <Plot updater={stats} resources={filteredRelics_} points={filteredRelics_.map((relic, i) => [
     Stat.runs(stats[relic][Standard.ResStats.ANY]) / Stat.runs(stats.gen[Standard.GenStats.ALL]),
     Stat.ratio(stats[relic][Standard.ResStats.ANY])
-])} scalex={true} />
+])} />
 {:else}
 <Table title="Relic" resources={filteredRelics} stats={stats} display={[
     [Standard.ResStats.ANY, "Win%"],
@@ -345,27 +363,25 @@
     }
 
 
-    #panel-runs { grid-row: 1; grid-column: 1 / span 2; }
-    #panel-players { grid-row: 1; grid-column: 3 / span 2; }
-    #panel-winrate { grid-row: 1; grid-column: 5 / span 2; }
+    #panel-runs { grid-row: 1; grid-column: 1 / span 1; }
+    #panel-players { grid-row: 1; grid-column: 2 / span 1; }
+    #panel-winrate { grid-row: 1; grid-column: 3 / span 2; }
+    #panel-duration { grid-row: 1; grid-column: 5 / span 2; }
     #panel-dr-act { grid-row: 2; grid-column: 1 / span 3; }
     #panel-wr-act { grid-row: 3; grid-column: 1 / span 3; }
     #panel-wr-char { grid-row: 2 / span 2; grid-column: 4 / span 3; }
 
     @media (width <= 1200px) {
-        #panel-dr-act { grid-row: 2; grid-column: 1 / span 6; }
-        #panel-wr-act { grid-row: 3; grid-column: 1 / span 6; }
-        #panel-wr-char { grid-row: 4; grid-column: 1 / span 6; }
+        #panel-runs     { grid-row: 1; grid-column: 1 / span 3; }
+        #panel-players  { grid-row: 1; grid-column: 4 / span 3; }
+        #panel-winrate  { grid-row: 2; grid-column: 1 / span 6; }
+        #panel-duration { grid-row: 3; grid-column: 1 / span 6; }
+        #panel-dr-act   { grid-row: 4; grid-column: 1 / span 6; }
+        #panel-wr-act   { grid-row: 5; grid-column: 1 / span 6; }
+        #panel-wr-char  { grid-row: 6; grid-column: 1 / span 6; }
     }
 
     @media (width <= 512px) {
-        #panel-runs    { grid-row: 1; grid-column: 1 / span 3; }
-        #panel-players { grid-row: 1; grid-column: 4 / span 3; }
-        #panel-winrate { grid-row: 2; grid-column: 1 / span 6; }
-        #panel-dr-act  { grid-row: 3; grid-column: 1 / span 6; }
-        #panel-wr-act  { grid-row: 4; grid-column: 1 / span 6; }
-        #panel-wr-char { grid-row: 5; grid-column: 1 / span 6; }
-
         .wins-flex {
             flex-direction: column;
             gap: 32px;

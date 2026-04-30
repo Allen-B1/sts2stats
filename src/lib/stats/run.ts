@@ -1,5 +1,7 @@
 export interface Run {
     start: number,
+    duration: number,
+
     version: string,
     asc: number,
     players: Player[],
