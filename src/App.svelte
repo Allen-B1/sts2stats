@@ -221,6 +221,14 @@
     }
 
     let sidebarOpen = $state(false);
+
+    onMount(() => {
+        window['removeStats'] = async function() {
+            await db.deleteGlobalStats();
+            await db.deleteStats("asc-10_p-1");
+            console.log("done");
+        }
+    });
 </script>
 
 

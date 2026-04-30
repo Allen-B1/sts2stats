@@ -116,4 +116,11 @@ export class Database {
             deleteDoc(doc.ref);
         }));
     }
+
+    async deleteStats(filter: Filter) {
+        const docs = await getDocs(query(collection(this.db, "stats-" + filter)));
+        await Promise.all(docs.docs.map(doc => {
+            deleteDoc(doc.ref);
+        }));
+    }
 }

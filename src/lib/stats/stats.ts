@@ -110,7 +110,7 @@ export namespace Schema {
                 
                 return [rewards.length, rewards.filter(reward => reward.picked).length];
             } catch(err) {
-                console.log(run);
+                console.error(run);
                 throw err;
             }
         }
@@ -125,7 +125,7 @@ export namespace Schema {
                 
                 return [rewards.length, rewards.filter(reward => reward.picked).length];
             } catch(err) {
-                console.log(run);
+                console.error(run);
                 throw err;
             }
         }
@@ -207,7 +207,6 @@ export namespace Standard {
             data[resource] = computeStats(runs, caches, RES_STATS(resource));
         }
         data.gen = computeStats(runs, caches, GEN_STATS);
-
         return data;
     }
 

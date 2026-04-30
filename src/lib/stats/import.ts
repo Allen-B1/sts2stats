@@ -88,16 +88,12 @@ export function importRun(data: any, id: number) : Run  {
     for (let floorNum = 0; floorNum < floors.length; floorNum++) {
         const floor = floors[floorNum];
 
-        if (floor.map_point_type == "shop") {
-            continue;
-        }
-
         if (floor.player_stats) for (let i = 0; i < floor.player_stats.length; i++) {
             rewards[`rewards-${i}`] = rewards[`rewards-${i}`] || [];
             const playerStats = floor.player_stats[i];
             const playerRewards = rewards[`rewards-${i}`];
 
-            if (playerStats.card_choices) {
+            if (playerStats.card_choices && floor.map_point_type != "shop") {
                 playerRewards.push(...playerStats.card_choices.map((choice: any) => ({
                     floor: floorNum,
                     resource: choice.card.id,
@@ -114,8 +110,8 @@ export function importRun(data: any, id: number) : Run  {
             }
 
             if (floor.rooms && floor.rooms[0] && floor.rooms[0].room_type == "shop" && playerStats.relic_choices) {
-                playerRewards.push(...playerStats.relic_choices.map((choice: any) => ({
-                    reosurce: choice.choice as ResourceID,
+                playerRewards.push(...(playerStats.relic_choices as any[]).map((choice) => ({
+                    resource: choice.choice as ResourceID,
                     floor: floorNum,
                     picked: choice.was_picked
                 })));
