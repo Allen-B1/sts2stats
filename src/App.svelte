@@ -142,7 +142,7 @@
     });
     let activeAsc = $state(10);
     let activeVersion: string = $state("v0.104");
-    const VERSIONS = ["v0.104", "v0.103", "v0.102", "v0.101", "v0.100"];
+    const VERSIONS = ["v0.105", "v0.104", "v0.103", "v0.102", "v0.101", "v0.100"];
 
     let activeMode: "1" | "2" | "3" | "4" | "m" | "any" = $state("1");
     let activeStats: Standard.Stats | null = $state(null);
